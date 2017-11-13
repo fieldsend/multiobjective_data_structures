@@ -1,0 +1,14 @@
+
+*.ctxt
+
+*.class
+
+*.html
+
+*.txt
+
+doc/package-list
+
+*.gif
+
+*.css

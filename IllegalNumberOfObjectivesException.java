@@ -5,13 +5,13 @@
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class IllegalNumberOfObjectives extends Exception
+public class IllegalNumberOfObjectivesException extends Exception
 {
-    public IllegalNumberOfObjectives() {
+    public IllegalNumberOfObjectivesException() {
         super();
     }
     
-    public IllegalNumberOfObjectives(String message) {
+    public IllegalNumberOfObjectivesException(String message) {
         super(message);
     }
 }

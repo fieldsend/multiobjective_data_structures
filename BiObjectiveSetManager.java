@@ -26,10 +26,10 @@ public class BiObjectiveSetManager implements ParetoSetManager
     }
     
     @Override
-    public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectives
+    public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException
     {
         if (s.getNumberOfObjectives()!=NUMBER_OF_OBJECTIVES)
-            throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");
+            throw new IllegalNumberOfObjectivesException("BiObjectiveSetManager can only manage solutions with two objectives");
         
         Solution element = contents.floor(new ComparableSolutionSingleValue(s,0)); // get element in set less than or equal to s on first objective with greatest first objective value    
         if (element!=null)
@@ -39,7 +39,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
     }
             
     @Override
-    public boolean add(Solution s) throws IllegalNumberOfObjectives
+    public boolean add(Solution s) throws IllegalNumberOfObjectivesException
     {
         // first check not weakly dominated
         if (weaklyDominates(s))
@@ -101,7 +101,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
     }
     
     //@Override
-    public static ParetoSetManager managerFactory(long seed) throws IllegalNumberOfObjectives
+    public static ParetoSetManager managerFactory(long seed) throws IllegalNumberOfObjectivesException
     {
         //if (numberOfObjectives != 2)
         //    throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");

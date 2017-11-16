@@ -20,7 +20,7 @@ public class LinearListManager implements ParetoSetManager
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
     }
     
-    public boolean add(Solution s) throws IllegalNumberOfObjectives
+    public boolean add(Solution s) throws IllegalNumberOfObjectivesException
     {
         // first check not weakly dominated
         if (weaklyDominates(s))
@@ -29,14 +29,14 @@ public class LinearListManager implements ParetoSetManager
         return contents.add(s);
     }
     
-    private void removeDominated(Solution s) throws IllegalNumberOfObjectives
+    private void removeDominated(Solution s) throws IllegalNumberOfObjectivesException
     {
         for (int i=contents.size()-1; i>=0; i--)
             if (s.dominates(contents.get(i)))
                 contents.remove(i);
     }
     
-    public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectives
+    public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException
     {
         for (Solution c : contents)
             if (c.weaklyDominates(s))
@@ -62,5 +62,12 @@ public class LinearListManager implements ParetoSetManager
     public void clean()
     {
         contents.clear();
+    }
+    
+    public static ParetoSetManager managerFactory(long seed, int numberOfObjectives) throws IllegalNumberOfObjectivesException
+    {
+        //if (numberOfObjectives != 2)
+        //    throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");
+        return new LinearListManager(seed, numberOfObjectives);
     }
 }

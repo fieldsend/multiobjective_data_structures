@@ -72,15 +72,24 @@ interface Solution {
                 array.add(j++);
         return array;     
     }
-    
-    default int betterOrEqualIndex(Solution s, int elementWeights[]) {
+    /**
+     * calculates a weighted value depending on which objectives this Solution is greater 
+     * or equal to argument s on
+     */
+    default int worseOrEqualIndex(Solution s, int elementWeights[]) {
         int val = 0;
         for (int i = 0; i < getNumberOfObjectives(); i++) 
-            if (getFitness(i) <= s.getFitness(i))
+            if (getFitness(i) >= s.getFitness(i))
                 val+=elementWeights[i];
         
         return val; 
     }
     
-    
+    default boolean isFitnessTheSame(Solution s) {
+        for (int i = 0; i < getNumberOfObjectives(); i++) 
+            if (getFitness(i) != s.getFitness(i))
+                return false;
+        
+        return true; 
+    }
 }

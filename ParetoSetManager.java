@@ -16,12 +16,12 @@ public interface ParetoSetManager
      * if the solution is added (non-weakly dominated by the set), returns false if it 
      * is not added (as it is weakly dominated by the set).  
      */
-    boolean add(Solution s) throws IllegalNumberOfObjectives;
+    boolean add(Solution s) throws IllegalNumberOfObjectivesException;
     
     /**
      * returns true if this pareto set weakly dominates s
      */
-    boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectives;
+    boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException;
     
     /**
      * Returns contents of the set in an array.
@@ -52,7 +52,7 @@ public interface ParetoSetManager
     /**
      * Replaces the contents of this set, with that mantained in the argument.
      */
-    default void replace(ParetoSetManager m) throws IllegalNumberOfObjectives {
+    default void replace(ParetoSetManager m) throws IllegalNumberOfObjectivesException {
         this.clean();
         for (Solution s : m.getContents())
             this.add(s);

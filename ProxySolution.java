@@ -40,4 +40,17 @@ public class ProxySolution implements Solution
         return objectives.length;
     }
     
+    /**
+     * Equal if fitness the same
+     */
+    @Override
+    public boolean equals(Object o){
+        //System.out.println("In equals check " + this + " "+ o);
+        if (o instanceof Solution) {
+          //  System.out.println(getFitness());
+          //  System.out.println(((Solution) o).getFitness());
+            return isFitnessTheSame((Solution) o);
+        }
+        return false;
+    }
 }

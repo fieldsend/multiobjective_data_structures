@@ -14,3 +14,5 @@ doc/package-list
 *.css
 
 *.bluej
+
+package.bluej

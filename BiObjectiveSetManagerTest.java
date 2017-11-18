@@ -6,21 +6,22 @@ import org.junit.Before;
 import org.junit.Test;
 import java.util.Random;
 import java.util.Collection;
+
 /**
- * The test class MTQuadTree1Test.
+ * The test class BiObjectiveSetManagerTest.
  *
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class MTQuadTree1Test
+public class BiObjectiveSetManagerTest
 {
     private ParetoSetManager list;
     private Random rng;
-    private int OBJECTIVE_NUMBER = 10;
+    private int OBJECTIVE_NUMBER = 2;
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public MTQuadTree1Test()
+    public BiObjectiveSetManagerTest()
     {
     }
 
@@ -32,7 +33,7 @@ public class MTQuadTree1Test
     @Before
     public void setUp() throws IllegalNumberOfObjectivesException
     {
-        list = MTQuadTree1.managerFactory(OBJECTIVE_NUMBER);
+        list = BiObjectiveSetManager.managerFactory(0L);
         rng = new Random(0L);
     }
 
@@ -64,7 +65,7 @@ public class MTQuadTree1Test
             double[] toAdd = new double[OBJECTIVE_NUMBER];
             for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
                 toAdd[ii] = rng.nextGaussian();
-            System.out.println("Query point: "+ toAdd[0]+ "  " + toAdd[1]+ "  " + toAdd[2]);
+            System.out.println("Query point: "+ toAdd[0]+ "  " + toAdd[1]);
             
                 //System.out.println(toAdd[0]+ "  " + toAdd[1]);
             System.out.println("added "+linearList.add(new ProxySolution(toAdd)));
@@ -77,12 +78,12 @@ public class MTQuadTree1Test
             
             for (Solution s : set1) {
                 toAdd = s.getFitness();
-                System.out.println("member Quad Tree: " + s+" "+ toAdd[0]+ "  " + toAdd[1]+ "  " + toAdd[2]);
+                System.out.println("member Quad Tree: " + s+" "+ toAdd[0]+ "  " + toAdd[1]);
             }
             
             for (Solution s : set2) {
                 toAdd = s.getFitness();
-                System.out.println("member Linear List: "+ s+" "+ toAdd[0]+ "  " + toAdd[1]+ "  " + toAdd[2]);
+                System.out.println("member Linear List: "+ s+" "+ toAdd[0]+ "  " + toAdd[1]);
             }
             // now check contents match    
             System.out.println(set1.size());

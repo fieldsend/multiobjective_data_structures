@@ -4,6 +4,7 @@ import java.util.SortedSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * BiObjectiveSetManager -- implementation of ParetoSetManager that is optimised for bi-objective problems
@@ -65,7 +66,10 @@ public class BiObjectiveSetManager implements ParetoSetManager
     @Override
     public Collection<? extends Solution> getContents()
     {
-        return contents;
+        ArrayList<Solution> list = new ArrayList<>(contents.size());
+        for (ComparableSolutionSingleValue s : contents)
+            list.add(s.getDecoratedSolution());
+        return list;
     }
     
     @Override

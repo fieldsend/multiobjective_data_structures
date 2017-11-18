@@ -13,114 +13,28 @@ import java.util.Collection;
  */
 public class MTQuadTree1 implements ParetoSetManager
 {
-    private MTQuadTreeNode root = null;
-    private int numberOfElements = 0;
-    //private HashMap<ArrayList<Boolean>,Integer> kSucessorMap = new HashMap<ArrayList<Boolean>,Integer>();
-    //private HashMap<Integer,int[]> k0SetMap = new HashMap<>();
-    //private HashMap<Integer,int[]> k1SetMap = new HashMap<>();
-    private final int NUMBER_OF_OBJECTIVES;
-    private int[] elementWeights;
-    private final int MAX_INDEX;
-    private final int MIN_INDEX=0;
-    private int lChildrenSet0IndicesLessThanK[][]; // holds array of indices for all indexs where corresonding 0 bits are in same place and index is lower
-    private int lChildrenSet1IndicesLessThanL[][]; // holds array of indices for all indexs where corresonding 1 bits are in same place and index is higher
-    private int lChildrenSet0Indices[][]; // holds array of indices for all indexs where corresonding 0 bits are in same place and index is lower
-    private int lChildrenSet1Indices[][]; // holds array of indices for all indexs where corresonding 1 bits are in same place and index is higher
+    MTQuadTreeNode root = null; // tree root
+    int numberOfElements = 0; //current size of managed Pareto set
+    public final int NUMBER_OF_OBJECTIVES; // number of objectives of solutions being managed
+    int[] elementWeights;
+    final int MAX_INDEX;
+    final int MIN_INDEX=0;
+    int lChildrenSet0IndicesLessThanK[][]; // holds array of indices for all indexs where corresonding 0 bits are in same place and index is lower
+    int lChildrenSet1IndicesLessThanL[][]; // holds array of indices for all indexs where corresonding 1 bits are in same place and index is higher
+    int lChildrenSet0Indices[][]; // holds array of indices for all indexs where corresonding 0 bits are in same place and index is lower
+    int lChildrenSet1Indices[][]; // holds array of indices for all indexs where corresonding 1 bits are in same place and index is higher
 
-    private MTQuadTree1(int numberOfObjectives) { 
+    MTQuadTree1(int numberOfObjectives) { 
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
         elementWeights = new int[numberOfObjectives];
         for (int i = 0; i < numberOfObjectives; i++)
             elementWeights[i] = (int) Math.pow(2,i);
         MAX_INDEX = (int) Math.pow(2,numberOfObjectives)-1;
-        setUpMatrices();
-    }
-
-    private void setUpMatrices() {
         lChildrenSet0IndicesLessThanK = new int[MAX_INDEX][];
         lChildrenSet1IndicesLessThanL = new int[MAX_INDEX][];
         lChildrenSet0Indices = new int[MAX_INDEX][];
         lChildrenSet1Indices = new int[MAX_INDEX][];
-        // Set up matrices of mappings
-        for (int i = MIN_INDEX+1; i < MAX_INDEX; i++) {
-            ArrayList<Integer> tempZeros = new ArrayList<>(); 
-            for (int j = MIN_INDEX+1; j < i; j++){
-                // use bitwise operators to check if has all zeros in same place;
-                if ((~i & ~j) == ~i) {
-                    tempZeros.add(j);
-                }
-            }
-            lChildrenSet0IndicesLessThanK[i] = new int[tempZeros.size()];
-            for (int j=0; j<tempZeros.size(); j++)
-                lChildrenSet0IndicesLessThanK[i][j] = tempZeros.get(j);
-            for (int j = i; j < MAX_INDEX; j++){
-                // use bitwise operators to check if has all zeros in same place;
-                if ((~i & ~j) == ~i) {
-                    tempZeros.add(j);
-                }
-            }
-            lChildrenSet0Indices[i] = new int[tempZeros.size()];
-            for (int j=0; j<tempZeros.size(); j++)
-                lChildrenSet0Indices[i][j] = tempZeros.get(j);    
-                
-                
-            ArrayList<Integer> tempOnes = new ArrayList<>(); 
-            for (int j = i + 1; j < MAX_INDEX; j++){
-                // use bitwise operators to check if has all ones in same place;
-                if ((i & j) == i) {
-                    tempOnes.add(j);
-                }
-            }
-            lChildrenSet1IndicesLessThanL[i] = new int[tempOnes.size()];
-            for (int j=0; j<tempOnes.size(); j++)
-                lChildrenSet1IndicesLessThanL[i][j] = tempOnes.get(j);
-            for (int j = MIN_INDEX+1; j < i+1; j++){
-                // use bitwise operators to check if has all ones in same place;
-                if ((i & j) == i) {
-                    tempOnes.add(j);
-                }
-            }
-            lChildrenSet1Indices[i] = new int[tempOnes.size()];
-            for (int j=0; j<tempOnes.size(); j++)
-                lChildrenSet1Indices[i][j] = tempOnes.get(j);    
-                  
-        }
-
-        printMatrices();
-    }
-
-    private void printMatrices() {
-        System.out.println("LchildrenSet0IndicesLessThanK");
-        for (int i = MIN_INDEX+1; i < MAX_INDEX; i++) {
-            System.out.print("Index: " + i + "---");
-            for (int j=0; j<lChildrenSet0IndicesLessThanK[i].length; j++)
-                System.out.print(", " + lChildrenSet0IndicesLessThanK[i][j]);
-            System.out.println();  
-        }
-
-        System.out.println("LchildrenSet1IndicesLessThanL");
-        for (int i = MIN_INDEX+1; i < MAX_INDEX; i++) {
-            System.out.print("Index: " + i + "---");
-            for (int j=0; j<lChildrenSet1IndicesLessThanL[i].length; j++)
-                System.out.print(", " + lChildrenSet1IndicesLessThanL[i][j]);
-            System.out.println();  
-        }
-        
-        System.out.println("LchildrenSet0Indices");
-        for (int i = MIN_INDEX+1; i < MAX_INDEX; i++) {
-            System.out.print("Index: " + i + "---");
-            for (int j=0; j<lChildrenSet0Indices[i].length; j++)
-                System.out.print(", " + lChildrenSet0Indices[i][j]);
-            System.out.println();  
-        }
-
-        System.out.println("LchildrenSet1Indices");
-        for (int i = MIN_INDEX+1; i < MAX_INDEX; i++) {
-            System.out.print("Index: " + i + "---");
-            for (int j=0; j<lChildrenSet1Indices[i].length; j++)
-                System.out.print(", " + lChildrenSet1Indices[i][j]);
-            System.out.println();  
-        }
+        MTHelperClass.setUpMatrices(MIN_INDEX, MAX_INDEX, lChildrenSet0IndicesLessThanK,lChildrenSet1IndicesLessThanL,lChildrenSet0Indices,lChildrenSet1Indices);
     }
 
     @Override
@@ -134,10 +48,6 @@ public class MTQuadTree1 implements ParetoSetManager
         return recursiveDominatedCheck(s,root);
     }
 
-    /*private int[] getLchildrenIndicesLessthanK(int k) {
-    return new int[] {};
-    }*/
-
     @Override
     public boolean add(Solution s) throws IllegalNumberOfObjectivesException{
         if (s.getNumberOfObjectives()!=NUMBER_OF_OBJECTIVES)
@@ -146,7 +56,6 @@ public class MTQuadTree1 implements ParetoSetManager
         if (root == null){
             root = new MTQuadTreeNode(s,null);
             numberOfElements++;
-            this.setUpMap(s.getNumberOfObjectives()); // set up indexing map on first use
             return true;
         } else {
             return recursivelyAddProcess(s, root);
@@ -163,7 +72,6 @@ public class MTQuadTree1 implements ParetoSetManager
         if (index==MIN_INDEX){ // node is dominated, so will have to be removed and  all its children reinserted
             MTQuadTreeNode[] childrenOfDominatedNode = n.getChildren();
             n.setCargoAndCleanChildren(s); // one added and one removed, so no changed of numberOfElements necessary
-            System.out.println("Added into dominated slot");
             for (MTQuadTreeNode child : childrenOfDominatedNode){ 
                 if (child!=null)
                     recursivelyReInsert(s,child,n,true); // add child (at it's children) from n as parent
@@ -172,7 +80,6 @@ public class MTQuadTree1 implements ParetoSetManager
         }
         //check if dominated by any sucessors STEP 3 in M&T paper
         int[] potentialDominators = getLchildrenSet0IndicesLessThanK(index);
-        //System.out.println("index "+index + " "+ s + " "+ n);
         for (int l : potentialDominators) 
             if (n.getChild(l)!=null)
                 if (recursiveDominatedCheck(s,n.getChild(l)))
@@ -181,9 +88,6 @@ public class MTQuadTree1 implements ParetoSetManager
         // check if proposed solution dominates any sucessors, if so delete it and reinsert all its children 
         // STEP 4 in M&T paper
         int[] potentialDominated = getLchildrenSet1IndicesLessThanL(index);
-        //System.out.println("index "+index + " "+ s + " "+ n);
-        //for (int l : potentialDominated)
-        //    System.out.println("query index " + l);
         for (int l : potentialDominated) 
             if (n.getChild(l)!=null)
                 recursiveDominatesCheck(s,n,l);
@@ -193,7 +97,6 @@ public class MTQuadTree1 implements ParetoSetManager
         if (n.getChild(index)==null){
             n.setChild(new MTQuadTreeNode(s,n),index);
             numberOfElements++;
-            System.out.println("Added into empty slot");
             return true;
         } else { //replace root with k-child, then compare s to this new root
             return recursivelyAddProcess(s, n.getChild(index));
@@ -209,7 +112,6 @@ public class MTQuadTree1 implements ParetoSetManager
          * first insertion and acceptance in the tree, and all subsequant insertions cannot have been 
          * dominated by it)
          */
-        System.out.println("In recursivelyReInsert, check: "+ checkChildren); 
         // situation when first recursively sent for reinsertion, need to also reinsert all children and 
         // remove from overall counter tracking number of members in data structure 
         if (checkChildren) {
@@ -225,58 +127,48 @@ public class MTQuadTree1 implements ParetoSetManager
         if (index==MAX_INDEX) // solution dominated by putative solution so discard
             return;
         index = c.getCargo().worseOrEqualIndex(n.getCargo(),elementWeights);
-        //if (index==MAX_INDEX) // solution dominated by node n so discard
-        //    return;
-
             
         int[] potentialDominators = getLchildrenSet0IndicesLessThanK(index);
-        //System.out.println("index "+index + " "+ s + " "+ n);
         for (int l : potentialDominators) 
             if (n.getChild(l)!=null)
                 if (recursiveDominatedCheck(c.getCargo(),n.getChild(l)))
                     return;
     
-        //check if dominated by any sucessors
-        /*if (n.isAParent())
-            if(recursiveDominatedCheck(c.getCargo(),n,index))
-                return;
-*/
-        //check if dominated by sucessor at matching index, and add if necessary
         if (n.getChild(index)==null){
             n.setChild(c,index);
             numberOfElements++;
             return;
         } else { //replace root with k-child, then compare c to this as the new root
-            // last argument is flase as at this point all c's orginal children have been stripped off
+            // last argument is false as at this point all c's orginal children have been stripped off
             // and checked, and the counter alreday updated with c's removal
             recursivelyReInsert(potentialDominator,c, n.getChild(index),false);
             return;
         }
     }
 
-    private int[] getLchildrenSet0IndicesLessThanK(int index)
+    int[] getLchildrenSet0IndicesLessThanK(int index)
     {
         return lChildrenSet0IndicesLessThanK[index];
     }
 
-    private int[] getLchildrenSet1IndicesLessThanL(int index)
+    int[] getLchildrenSet1IndicesLessThanL(int index)
     {
         return lChildrenSet1IndicesLessThanL[index];
     }
 
-    private int[] getLchildrenSet0Indices(int index)
+    int[] getLchildrenSet0Indices(int index)
     {
         return lChildrenSet0Indices[index];
     }
 
-    private int[] getLchildrenSet1Indices(int index)
+    int[] getLchildrenSet1Indices(int index)
     {
         return lChildrenSet1Indices[index];
     }
 
     
     /* returns true if s dominated by any sucessors of n*/
-    private boolean recursiveDominatedCheck(Solution s, MTQuadTreeNode n) {
+    boolean recursiveDominatedCheck(Solution s, MTQuadTreeNode n) {
         int k = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         if (k==MAX_INDEX)
             return true;
@@ -291,13 +183,11 @@ public class MTQuadTree1 implements ParetoSetManager
 
     /* remove any dominated nodes and re-add any non-dominated children*/
     private void recursiveDominatesCheck(Solution s, MTQuadTreeNode n, int index) {
-        System.out.println("COMPARING " + s + " to " + n.getChild(index).getCargo() + " child " + index);
         int k = s.worseOrEqualIndex(n.getChild(index).getCargo(),elementWeights);
         if (k==0) { // sucessor is dominated by s, so remove and reinsert all children from global root
             MTQuadTreeNode[] childrenOfDominatedNode = n.getChild(index).getChildren();
             n.removeChild(index);
             numberOfElements--;
-            System.out.println("REMOVING DOMINATED SOLUTION");
             for (MTQuadTreeNode child : childrenOfDominatedNode){ 
                 if (child!=null)
                     recursivelyReInsert(s,child,root,true); // add child (at it's children) from root
@@ -310,25 +200,6 @@ public class MTQuadTree1 implements ParetoSetManager
             if (n.getChild(index).getChild(l)!=null)
                 recursiveDominatesCheck(s, n.getChild(index), l);
         return;
-    }
-
-    private void setUpMap(int m) {
-        // go through all permutations of objective comparisons to propogate
-        // map between boolean arrays of quality comparison, and k-successorship
-        /*
-        int numberOfDistinctVectors = (int) Math.pow(2,m);
-        for (int j = 0; j < numberOfDistinctVectors; j++) {
-        ArrayList<Boolean> array = new ArrayList<Boolean>(m);
-        int k = 0;
-        for (int i = 0; i< m; i++) {
-        int val = m*i+j;
-        int ret  = (1 & (val >>> i));
-        array.add(ret != 0);
-        k += (array.get(i)) ? (int) Math.pow(2,m-1) : 0;
-        kSucessorMap.put(array,new Integer(k));
-        }
-        }
-         */
     }
 
     @Override

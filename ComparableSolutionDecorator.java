@@ -46,4 +46,9 @@ public abstract class ComparableSolutionDecorator implements Solution, Comparabl
         }
         return false;
     }
+    
+    public Solution getDecoratedSolution()
+    {
+        return solution;
+    }
 }

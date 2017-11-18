@@ -1,5 +1,7 @@
 import java.util.Random;
 import java.util.Set;
+
+import java.util.Collection;
 import java.util.Iterator;
 /**
  * Write a description of class Tester here.
@@ -9,7 +11,7 @@ import java.util.Iterator;
  */
 public class Tester
 {
-    public static void main(String[] args) throws IllegalNumberOfObjectives {
+    public static void main(String[] args) throws IllegalNumberOfObjectivesException {
         Random rng = new Random();
         ParetoSetManager manager = BiObjectiveSetManager.managerFactory(0L);
         final int MAX_REPS = 1000000;
@@ -30,9 +32,9 @@ public class Tester
             //System.out.println("Random values: "+ e.getFitness(0) + ", "+ e.getFitness(1));
           
         }
-        Set<Solution> set = manager.getContents();
+        Collection<? extends Solution> set = manager.getContents();
         
-        Iterator<Solution> iterator = set.iterator();
+        Iterator<? extends Solution> iterator = set.iterator();
         // now iterator over this, reoving each dominated element in turn, until first non-dominated element 
         // reached, in which case break out
         while (iterator.hasNext()){

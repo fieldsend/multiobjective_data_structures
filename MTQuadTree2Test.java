@@ -7,20 +7,20 @@ import org.junit.Test;
 import java.util.Random;
 import java.util.Collection;
 /**
- * The test class MTQuadTree1Test.
+ * The test class MTQuadTree2Test.
  *
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class MTQuadTree1Test
+public class MTQuadTree2Test
 {
     private ParetoSetManager list;
     private Random rng;
-    private int OBJECTIVE_NUMBER = 10;
+    private int OBJECTIVE_NUMBER = 3;
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public MTQuadTree1Test()
+    public MTQuadTree2Test()
     {
     }
 
@@ -32,7 +32,7 @@ public class MTQuadTree1Test
     @Before
     public void setUp() throws IllegalNumberOfObjectivesException
     {
-        list = MTQuadTree1.managerFactory(OBJECTIVE_NUMBER);
+        list = MTQuadTree2.managerFactory(OBJECTIVE_NUMBER);
         rng = new Random(0L);
     }
 
@@ -72,6 +72,7 @@ public class MTQuadTree1Test
             System.out.println(list.size());
             System.out.println(linearList.size());
             System.out.println(list);
+            
             Collection<? extends Solution> set1 = list.getContents();
             Collection<? extends Solution> set2 = linearList.getContents();
             
@@ -87,6 +88,9 @@ public class MTQuadTree1Test
             // now check contents match    
             System.out.println(set1.size());
             System.out.println(set2.size());
+            
+            assertTrue(list.size()==linearList.size());
+            
             assertTrue(set1.size()==set2.size());
             assertTrue(set2.containsAll(set1));
             assertTrue(set1.containsAll(set2)); //WHY CAUSING ERROR?

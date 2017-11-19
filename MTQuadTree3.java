@@ -32,6 +32,8 @@ public class MTQuadTree3 extends MTQuadTree1
      * of subtree members
      */
     private void replace(MTQuadTreeNode n, Solution s) {
+        System.out.println("In Replace "+ numberOfElements+" "+ s + " " +n.getCargo());
+        
         n.setCargo(s);
         MTQuadTreeNode[] potentialDominated = n.getChildren();
         n.cleanChildren();
@@ -41,6 +43,8 @@ public class MTQuadTree3 extends MTQuadTree1
     }
 
     private void reconsider(MTQuadTreeNode c, MTQuadTreeNode t) {
+        System.out.println("In Reconsider "+ numberOfElements+" "+ c.getCargo() + " " +t.getCargo());
+        
         MTQuadTreeNode[] potentialDominated = t.getChildren();
         t.cleanChildren();
         for (MTQuadTreeNode child : potentialDominated) 
@@ -59,9 +63,12 @@ public class MTQuadTree3 extends MTQuadTree1
     }
 
     private void reinsert(MTQuadTreeNode c, MTQuadTreeNode t) {
+        System.out.println("In Reinsert "+ numberOfElements+" "+ c.getCargo() + " " +t.getCargo());
+        
         for (MTQuadTreeNode child : t.getChildren()) 
             if (child!=null)
                 reinsert(c,child);
+        t.cleanChildren();        
         int index = t.getCargo().worseOrEqualIndex(c.getCargo(),elementWeights);
         if (c.getChild(index)==null) {
             c.setChild(t,index);
@@ -110,20 +117,30 @@ public class MTQuadTree3 extends MTQuadTree1
 
     /* remove any dominated nodes */
     private void recursiveDominatesCheck(Solution s, MTQuadTreeNode n,MTQuadTreeNode parent,int indexOfChild) {
+        System.out.println("In RecDomsCheck "+ numberOfElements+" "+ s + " " +n.getCargo());
+        
         int index = s.worseOrEqualIndex(n.getCargo(),elementWeights);
+        int[] potentialDominated;
         if (index==0) {// solution dominates so discard
             delete(n,parent,indexOfChild);
-            return;
+            // the indexOfChild node child of parent has now changed, 
+            // potentially also dominated
+            if (parent.getChild(indexOfChild)!=null)
+                recursiveDominatesCheck(s, parent.getChild(indexOfChild),parent,indexOfChild);
         }
-        int[] potentialDominated = getLchildrenSet1Indices(index);
-
-        for (int l : potentialDominated) 
-            if (n.getChild(l)!=null)
-                recursiveDominatesCheck(s, n.getChild(l),n,l);
+        else 
+            for (int l : getLchildrenSet1Indices(index)) 
+                if (n.getChild(l)!=null)
+                    recursiveDominatesCheck(s, n.getChild(l),n,l);
         return;
     }
 
+    /*
+     * Returns reference to node which has replace n at indexOfChild with the parent
+     */
     private void delete(MTQuadTreeNode n,MTQuadTreeNode parent,int indexOfChild) {
+        System.out.println("In delete "+ numberOfElements+" " +n.getCargo());
+        
         for (int i=MIN_INDEX+1; i<MAX_INDEX; i++) {
             if (n.getChild(i)!=null) {
                 numberOfElements--;
@@ -131,13 +148,14 @@ public class MTQuadTree3 extends MTQuadTree1
                 for (int k = i+1; k <MAX_INDEX; k++) 
                     if (n.getChild(k)!=null)
                         reinsert(n.getChild(i),n.getChild(k));
-                
+                return;
             }
         }
         // n has no children, so simply detach from its parent
         numberOfElements--;
         parent.removeChild(indexOfChild);
     }
+    
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new MTQuadTree3(numberOfObjectives);
     }

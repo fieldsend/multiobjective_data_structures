@@ -1,5 +1,6 @@
 
 
+
 import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
@@ -7,18 +8,19 @@ import org.junit.Test;
 import java.util.Random;
 import java.util.Collection;
 /**
- * The test class MTQuadTree1Test.
+ * The test class MTQuadTree3Test.
  *
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class MTQuadTree1Test
+public class BSPTreeArchiveTest
 {
     private int numberOfQueries = 2000;
+    
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public MTQuadTree1Test()
+    public BSPTreeArchiveTest()
     {
     }
 
@@ -44,7 +46,7 @@ public class MTQuadTree1Test
     
     @Test
     public void testSize(){
-        ParetoSetManager list = MTQuadTree1.managerFactory(2);
+        ParetoSetManager list = BSPTreeArchive.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
@@ -53,20 +55,27 @@ public class MTQuadTree1Test
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(MTQuadTree1.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+    }
+    
+    @Test(timeout=200000)
+    public void testAdd3()
+    throws IllegalNumberOfObjectivesException {
+        int objectiveNumber = 3;
+        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(MTQuadTree1.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(MTQuadTree1.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
 }

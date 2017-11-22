@@ -14,9 +14,8 @@ import java.util.Collection;
  */
 public class MTQuadTree3Test
 {
-    private ParetoSetManager list;
-    private Random rng;
-    private int OBJECTIVE_NUMBER = 3;
+    private int numberOfQueries = 2000;
+    
     /**
      * Default constructor for test class LinearListManagerTest
      */
@@ -32,8 +31,6 @@ public class MTQuadTree3Test
     @Before
     public void setUp() throws IllegalNumberOfObjectivesException
     {
-        list = MTQuadTree3.managerFactory(OBJECTIVE_NUMBER);
-        rng = new Random(0L);
     }
 
     /**
@@ -44,58 +41,40 @@ public class MTQuadTree3Test
     @After
     public void tearDown()
     {
-        list = null;
     }
     
     @Test
     public void testSize(){
+        ParetoSetManager list = MTQuadTree3.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
     
-    @Test(timeout=20000)
-    public void testAdd()
+    @Test(timeout=200000)
+    public void testAdd2()
     throws IllegalNumberOfObjectivesException {
-        ParetoSetManager linearList = LinearListManager.managerFactory(0L,OBJECTIVE_NUMBER);
-        int number = 10000;
-        for (int i=0; i<number; i++){
-            System.out.println("adding: " + i);
-            
-            double[] toAdd = new double[OBJECTIVE_NUMBER];
-            for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
-                toAdd[ii] = rng.nextGaussian();
-            System.out.println("Query point: "+ toAdd[0]+ "  " + toAdd[1]+ "  " + toAdd[2]);
-            
-                //System.out.println(toAdd[0]+ "  " + toAdd[1]);
-            System.out.println("added "+linearList.add(new ProxySolution(toAdd)));
-            System.out.println("added "+list.add(new ProxySolution(toAdd)));
-            System.out.println(list.size());
-            System.out.println(linearList.size());
-            System.out.println(list);
-            
-            Collection<? extends Solution> set1 = list.getContents();
-            Collection<? extends Solution> set2 = linearList.getContents();
-            
-            for (Solution s : set1) {
-                toAdd = s.getFitness();
-                System.out.println("member Quad Tree: " + s+" "+ toAdd[0]+ "  " + toAdd[1]+ "  " + toAdd[2]);
-            }
-            
-            for (Solution s : set2) {
-                toAdd = s.getFitness();
-                System.out.println("member Linear List: "+ s+" "+ toAdd[0]+ "  " + toAdd[1]+ "  " + toAdd[2]);
-            }
-            // now check contents match    
-            System.out.println(set1.size());
-            System.out.println(set2.size());
-            
-            assertTrue(list.size()==linearList.size());
-            
-            assertTrue(set1.size()==set2.size());
-            assertTrue(set2.containsAll(set1));
-            assertTrue(set1.containsAll(set2)); //WHY CAUSING ERROR?
-        }
-        
-        System.out.println(list.size());
+        int objectiveNumber = 2;
+        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+    }
+    
+    @Test(timeout=200000)
+    public void testAdd3()
+    throws IllegalNumberOfObjectivesException {
+        int objectiveNumber = 3;
+        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+    }
+    
+    @Test(timeout=200000)
+    public void testAdd10()
+    throws IllegalNumberOfObjectivesException {
+        int objectiveNumber = 10;
+        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+    }
+    
+    @Test(timeout=200000)
+    public void testAdd100()
+    throws IllegalNumberOfObjectivesException {
+        int objectiveNumber = 100;
+        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
 }

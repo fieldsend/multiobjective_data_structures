@@ -32,7 +32,7 @@ public class MTQuadTree3 extends MTQuadTree1
      * of subtree members
      */
     private void replace(MTQuadTreeNode n, Solution s) {
-        System.out.println("In Replace "+ numberOfElements+" "+ s + " " +n.getCargo());
+        //System.out.println("In Replace "+ numberOfElements+" "+ s + " " +n.getCargo());
         
         n.setCargo(s);
         MTQuadTreeNode[] potentialDominated = n.getChildren();
@@ -43,7 +43,7 @@ public class MTQuadTree3 extends MTQuadTree1
     }
 
     private void reconsider(MTQuadTreeNode c, MTQuadTreeNode t) {
-        System.out.println("In Reconsider "+ numberOfElements+" "+ c.getCargo() + " " +t.getCargo());
+        //System.out.println("In Reconsider "+ numberOfElements+" "+ c.getCargo() + " " +t.getCargo());
         
         MTQuadTreeNode[] potentialDominated = t.getChildren();
         t.cleanChildren();
@@ -63,7 +63,7 @@ public class MTQuadTree3 extends MTQuadTree1
     }
 
     private void reinsert(MTQuadTreeNode c, MTQuadTreeNode t) {
-        System.out.println("In Reinsert "+ numberOfElements+" "+ c.getCargo() + " " +t.getCargo());
+        //System.out.println("In Reinsert "+ numberOfElements+" "+ c.getCargo() + " " +t.getCargo());
         
         for (MTQuadTreeNode child : t.getChildren()) 
             if (child!=null)
@@ -79,7 +79,7 @@ public class MTQuadTree3 extends MTQuadTree1
 
     /* returns true if added, false otherwise */
     private boolean recursivelyAddProcess(Solution s, MTQuadTreeNode n) {
-        System.out.println("In RecAddProc "+ numberOfElements+" "+ s + " " +n.getCargo());
+        //System.out.println("In RecAddProc "+ numberOfElements+" "+ s + " " +n.getCargo());
         // calculate k-sucessorship STEP 2 in M&T paper
         int index = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         if (index==MAX_INDEX) // solution dominated so discard
@@ -117,7 +117,7 @@ public class MTQuadTree3 extends MTQuadTree1
 
     /* remove any dominated nodes */
     private void recursiveDominatesCheck(Solution s, MTQuadTreeNode n,MTQuadTreeNode parent,int indexOfChild) {
-        System.out.println("In RecDomsCheck "+ numberOfElements+" "+ s + " " +n.getCargo());
+        //System.out.println("In RecDomsCheck "+ numberOfElements+" "+ s + " " +n.getCargo());
         
         int index = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         int[] potentialDominated;
@@ -139,7 +139,7 @@ public class MTQuadTree3 extends MTQuadTree1
      * Returns reference to node which has replace n at indexOfChild with the parent
      */
     private void delete(MTQuadTreeNode n,MTQuadTreeNode parent,int indexOfChild) {
-        System.out.println("In delete "+ numberOfElements+" " +n.getCargo());
+        //System.out.println("In delete "+ numberOfElements+" " +n.getCargo());
         
         for (int i=MIN_INDEX+1; i<MAX_INDEX; i++) {
             if (n.getChild(i)!=null) {

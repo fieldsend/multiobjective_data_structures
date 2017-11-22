@@ -72,6 +72,7 @@ interface Solution {
                 array.add(j++);
         return array;     
     }
+    
     /**
      * calculates a weighted value depending on which objectives this Solution is greater 
      * or equal to argument s on

@@ -15,9 +15,8 @@ import java.util.Collection;
  */
 public class BiObjectiveSetManagerTest
 {
-    private ParetoSetManager list;
-    private Random rng;
-    private int OBJECTIVE_NUMBER = 2;
+    private int numberOfQueries = 2000;
+    
     /**
      * Default constructor for test class LinearListManagerTest
      */
@@ -33,8 +32,6 @@ public class BiObjectiveSetManagerTest
     @Before
     public void setUp() throws IllegalNumberOfObjectivesException
     {
-        list = BiObjectiveSetManager.managerFactory(0L);
-        rng = new Random(0L);
     }
 
     /**
@@ -45,54 +42,20 @@ public class BiObjectiveSetManagerTest
     @After
     public void tearDown()
     {
-        list = null;
     }
     
     @Test
-    public void testSize(){
+    public void testSize() throws IllegalNumberOfObjectivesException{
+        ParetoSetManager list = BiObjectiveSetManager.managerFactory(0L);
         assertTrue(list.size()==0);
     }
     
     
     @Test(timeout=20000)
-    public void testAdd()
+    public void testAdd2()
     throws IllegalNumberOfObjectivesException {
-        ParetoSetManager linearList = LinearListManager.managerFactory(0L,OBJECTIVE_NUMBER);
-        int number = 10000;
-        for (int i=0; i<number; i++){
-            System.out.println("adding: " + i);
-            
-            double[] toAdd = new double[OBJECTIVE_NUMBER];
-            for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
-                toAdd[ii] = rng.nextGaussian();
-            System.out.println("Query point: "+ toAdd[0]+ "  " + toAdd[1]);
-            
-                //System.out.println(toAdd[0]+ "  " + toAdd[1]);
-            System.out.println("added "+linearList.add(new ProxySolution(toAdd)));
-            System.out.println("added "+list.add(new ProxySolution(toAdd)));
-            System.out.println(list.size());
-            System.out.println(linearList.size());
-            System.out.println(list);
-            Collection<? extends Solution> set1 = list.getContents();
-            Collection<? extends Solution> set2 = linearList.getContents();
-            
-            for (Solution s : set1) {
-                toAdd = s.getFitness();
-                System.out.println("member Quad Tree: " + s+" "+ toAdd[0]+ "  " + toAdd[1]);
-            }
-            
-            for (Solution s : set2) {
-                toAdd = s.getFitness();
-                System.out.println("member Linear List: "+ s+" "+ toAdd[0]+ "  " + toAdd[1]);
-            }
-            // now check contents match    
-            System.out.println(set1.size());
-            System.out.println(set2.size());
-            assertTrue(set1.size()==set2.size());
-            assertTrue(set2.containsAll(set1));
-            assertTrue(set1.containsAll(set2)); //WHY CAUSING ERROR?
-        }
-        
-        System.out.println(list.size());
+        int objectiveNumber = 2;
+        SharedTest.exampleRun(BiObjectiveSetManager.managerFactory(0L),new Random(0L),objectiveNumber,numberOfQueries);      
     }
+    
 }

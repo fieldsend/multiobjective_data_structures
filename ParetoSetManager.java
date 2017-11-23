@@ -28,12 +28,6 @@ public interface ParetoSetManager
      */
     Collection<? extends Solution> getContents();
     
-    /** 
-     * Returns a member of the set at random. Should behave like a uniform random
-     * draw from the set.
-     */
-    Solution getRandomMember();
-    
     /**
      * Returns the number of elements of the set (the number of non-dominated solutions). 
      */

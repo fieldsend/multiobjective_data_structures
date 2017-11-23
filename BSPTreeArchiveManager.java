@@ -4,18 +4,18 @@ import java.util.TreeSet;
 import java.util.Iterator;
 
 /**
- * Write a description of class BSPTreeArchive here.
+ * NEED TO IMPLEMENT REBALANCING
  * 
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class BSPTreeArchive implements ParetoSetManager
+public class BSPTreeArchiveManager implements ParetoSetManager
 {
     private BSPTreeNode root;
     private int maxLeafSize;
     private final int NUMBER_OF_OBJECTIVES;
 
-    BSPTreeArchive(int numberOfObjectives, int maxLeafSize) {
+    BSPTreeArchiveManager(int numberOfObjectives, int maxLeafSize) {
         root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
         this.maxLeafSize = maxLeafSize;
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
@@ -216,10 +216,10 @@ public class BSPTreeArchive implements ParetoSetManager
     
     
     public static ParetoSetManager managerFactory(int numberOfObjectives, int maxLeafSize) {
-        return new BSPTreeArchive(numberOfObjectives,maxLeafSize);
+        return new BSPTreeArchiveManager(numberOfObjectives,maxLeafSize);
     }
 
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
-        return new BSPTreeArchive(numberOfObjectives,1);
+        return new BSPTreeArchiveManager(numberOfObjectives,1);
     }
 }

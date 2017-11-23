@@ -13,14 +13,14 @@ import java.util.Collection;
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class BSPTreeArchiveTest
+public class BSPTreeArchiveManagerTest
 {
     private int numberOfQueries = 2000;
     
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public BSPTreeArchiveTest()
+    public BSPTreeArchiveManagerTest()
     {
     }
 
@@ -46,7 +46,7 @@ public class BSPTreeArchiveTest
     
     @Test
     public void testSize(){
-        ParetoSetManager list = BSPTreeArchive.managerFactory(2);
+        ParetoSetManager list = BSPTreeArchiveManager.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
@@ -55,27 +55,27 @@ public class BSPTreeArchiveTest
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd3()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 3;
-        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(BSPTreeArchive.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
     }
 }

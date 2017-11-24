@@ -6,7 +6,7 @@
  * @version 0.1
  */
 interface Solution {
-    double[] getFitness(); 
+    //double[] getFitness(); 
     double getFitness(int index);
     void setFitness(int index, double value);
     void setFitness(double[] fitnesses);
@@ -93,4 +93,6 @@ interface Solution {
         
         return true; 
     }
+    
+    
 }

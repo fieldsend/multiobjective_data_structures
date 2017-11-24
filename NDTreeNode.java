@@ -17,7 +17,7 @@ public class NDTreeNode
     private double[] midpoint;
     private NDTreeNode[] children;
     private NDTreeNode parent;
-    private static final int MAX_LIST_SIZE = 20;
+    private static int MAX_LIST_SIZE;
     private static int NUMBER_OF_CHILDREN;
     
     NDTreeNode(int maxListSize, int numberOfChildren) {
@@ -177,7 +177,7 @@ public class NDTreeNode
             chidren[i].add(list.get(indexOfMostDistantChild));
         }
         // now empty remaining list members
-        for (
+        
         // detach previous list for garbage collection, as list members no all transferred to containers in children
         list = null;
     }

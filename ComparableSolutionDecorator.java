@@ -13,11 +13,11 @@ public abstract class ComparableSolutionDecorator implements Solution, Comparabl
     {
         this.solution = solution;
     }
-    @Override
+    /*@Override
     public double[] getFitness()
     {
         return solution.getFitness();
-    }
+    }*/
     @Override
     public double getFitness(int index)
     {

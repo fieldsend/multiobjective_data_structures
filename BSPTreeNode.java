@@ -119,11 +119,11 @@ public class BSPTreeNode
         if (maxLeafSize>1) {
             int tempDist= -1;
             ArrayList<Integer> validObjectives = new ArrayList<>(numberOfObjectives);
-            double[] v = setCovered.get(0).getFitness();
+            //double[] v = setCovered.get(0).getFitness();
                 
             loop1 : for (int i=0; i < numberOfObjectives; i++){
                 for (int j=1; j<setCovered.size(); j++) {
-                    if (v[i] != setCovered.get(j).getFitness(i)){
+                    if (setCovered.get(0).getFitness(i) != setCovered.get(j).getFitness(i)){
                         validObjectives.add(i);
                         continue loop1;
                     }

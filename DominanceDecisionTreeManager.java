@@ -41,13 +41,15 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
     }
 
     private boolean detectDomination(DDTNode node,Solution s) {
+        //System.out.println("compare " + s + " to " + node.getCargo());
         if (node.getCargo().weaklyDominates(s))
             return true;
         DDTNode[] children = node.getChildren();    
         for (int i=0; i<NUMBER_OF_OBJECTIVES; i++ ) 
             if (children[i] != null)
                 if (node.getCargo().getFitness(i)<=s.getFitness(i))
-                    return detectDomination(children[i],s);
+                    if(detectDomination(children[i],s))
+                        return true;
 
         return false;
     }
@@ -62,11 +64,12 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
                 break;
         }
         // all children of node have been processed by this point, and any dominated removed
+        children = node.getChildren();    
         if (s.weaklyDominates(node.getCargo())) {
             if (node.isLeaf()) {
-                node.detach();
+                node.detachAndReplace(null);
                 size--;
-                System.out.println("detaching leaf");
+                //System.out.println("detaching leaf" + node.getCargo());
                 return;
             }
             int j=0;
@@ -74,38 +77,23 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
             for (; j<NUMBER_OF_OBJECTIVES; j++) 
                 if (children[j] != null)
                     break;
-            DDTNode parent = node.getParent();        
+            DDTNode parent = node.getParent();  
+            //if (parent!=null)
+            //    System.out.println(parent.getCargo() + "replacing " + node.getCargo() + "by its subtree" + children[j].getCargo());
             size--;
 
             if (parent==null) {// special case when deleted node is top of tree
-                System.out.println("DELETING root");
+                //System.out.println("DELETING root, new root: " + children[j].getCargo());
                 root = children[j];
                 root.setParent(null,-1);
                 parent = root;
             } else 
-                parent.setChild(j,children[j]);
+                parent.setChild(node.getIndexAtParent(),children[j]);
             
             for (j++; j<NUMBER_OF_OBJECTIVES; j++)
                 if (children[j] != null)
                     treeInsert(parent,children[j]); //resinsert node
 
-            //             if (node.detachAndReplace(children[j])) { // detached not is not at top of tree
-            //                 for (j++; j<NUMBER_OF_OBJECTIVES; j++)
-            //                     if (children[j] != null)
-            //                         treeInsert(parent,children[j]); //resinsert node  
-            //             } else { // detached node is top of tree, so need to be careful on reinsertion 
-            //                 boolean rootReset = false;
-            //                 for (j++; j<NUMBER_OF_OBJECTIVES; j++) {
-            //                     if (children[j] != null) {
-            //                         if (rootReset)
-            //                             treeInsert(parent,children[j]); //resinsert node 
-            //                         else {
-            //                             root = children[j];
-            //                             rootReset=true;
-            //                         }
-            //                     }
-            //                 }
-            //             }
         }
     }
 
@@ -123,11 +111,11 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
         for (; i<NUMBER_OF_OBJECTIVES; i++ ) 
             if (node.getCargo().getFitness(i) > baseParent.getCargo().getFitness(i))
                 break;
+        //System.out.println(node.getCargo() + " -- " + baseParent.getCargo() + " -- "+ i);        
         if (baseParent.getChild(i)!=null)        
             insert(baseParent.getChild(i),node);
         else {
             baseParent.setChild(i,node);
-            node.setParent(baseParent,i);
         }
 
     }
@@ -173,5 +161,21 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
     public void clean() {
         root = null;
         size = 0;
+    }
+    
+    @Override
+    public String toString() {
+        String s="Root :";
+        s += recursivelyGetParentAndChildDetails(root);
+        return s;
+    }
+    
+    private String recursivelyGetParentAndChildDetails(DDTNode node) {
+        String s = " " + node.getCargo();
+        DDTNode[] children =  node.getChildren();
+        for (int i=0; i<NUMBER_OF_OBJECTIVES; i++)
+            if (children[i]!=null)
+                s += "C" +i + " "+ recursivelyGetParentAndChildDetails(children[i]);
+        return s + "\n";
     }
 }

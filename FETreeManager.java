@@ -1,3 +1,5 @@
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Write a description of class FETreeManager here.
@@ -5,29 +7,26 @@
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class FETreeManager
+public class FETreeManager implements ParetoSetManager
 {
-    // instance variables - replace the example below with your own
-    private int x;
-
-    /**
-     * Constructor for objects of class FETreeManager
-     */
-    public FETreeManager()
-    {
-        // initialise instance variables
-        x = 0;
+    public boolean add(Solution s) throws IllegalNumberOfObjectivesException {
+        return true;
     }
-
-    /**
-     * An example of a method - replace this comment with your own
-     * 
-     * @param  y   a sample parameter for a method
-     * @return     the sum of x and y 
-     */
-    public int sampleMethod(int y)
-    {
-        // put your code here
-        return x + y;
+    
+    
+    public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException {
+        return true;
+    }
+    
+    public Collection<? extends Solution> getContents() {
+        return new ArrayList<Solution>();
+    }
+    
+    public int size(){
+        return 0;
+    }
+    
+    public void clean() {
+        
     }
 }

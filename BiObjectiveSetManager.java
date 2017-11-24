@@ -72,8 +72,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
         return list;
     }
     
-    @Override
-    public Solution getRandomMember()
+    /*public Solution getRandomMember()
     {
         if (contents.size()==0)
             return null;
@@ -90,7 +89,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
         Solution mock = new ProxySolution(new double[]{(d+offset)*range+head.getFitness(0)-offset*range, 0});
         
         return contents.higher(new ComparableSolutionSingleValue(mock,0)); //return contents.size()==0 ? null : contents.get(Random.nextInt(contents.size()));
-    }
+    }*/
     
     @Override
     public int size()

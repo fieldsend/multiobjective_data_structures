@@ -30,6 +30,7 @@ public class SharedTest
             System.out.println("Linear list added "+linearList.add(new ProxySolution(toAdd)));
             System.out.println(list.size());
             System.out.println(linearList.size());
+            
             //System.out.println(list);
             Collection<? extends Solution> set1 = list.getContents();
             Collection<? extends Solution> set2 = linearList.getContents();
@@ -42,10 +43,9 @@ public class SharedTest
                 System.out.println();
             }*/
             
-            for (Solution s : set2) {
-                toAdd = s.getFitness();
-                System.out.println("member Linear List: "+ s+" "+ toAdd[0]+ "  " + toAdd[1]);
-            }
+            /*for (Solution s : set2) {
+                System.out.println(s);
+            }*/
             // now check contents match    
             System.out.println(set1.size());
             System.out.println(set2.size());

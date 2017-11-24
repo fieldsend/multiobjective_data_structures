@@ -22,6 +22,8 @@ class DDTNode
         children = new DDTNode[cargo.getNumberOfObjectives()];
     }
     
+    
+    
     void setParent(DDTNode parent, int indexAtParent) {
         this.parent = parent;
         this.indexAtParent = indexAtParent;
@@ -39,8 +41,13 @@ class DDTNode
         return parent;
     }
     
+    int getIndexAtParent() {
+        return indexAtParent;
+    }
+    
     void setChild(int index, DDTNode node) {
         children[index] = node;
+        children[index].setParent(this,index);
     }
     
     Solution getCargo(){

@@ -21,6 +21,7 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
     }
 
+    @Override
     public boolean add(Solution s) throws IllegalNumberOfObjectivesException
     {
         if (s.getNumberOfObjectives() != NUMBER_OF_OBJECTIVES)
@@ -164,11 +165,13 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return k;
     }
 
+    @Override
     public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException
     {
         return (checkForDominanceWithoutChangingState(root,s,new TreeSet<Integer>(),new TreeSet<Integer>())<0);
     }
 
+    @Override
     public Collection<? extends Solution> getContents() {
          ArrayList<Solution> contents = new ArrayList<Solution>(this.size());
          recursivelyFillWithContents(root, contents);
@@ -184,14 +187,13 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         }
     }
 
-    public Solution getRandomMember(){
-        return null;
-    }
-
+    
+    @Override
     public int size() {
         return root.getNumberCovered();
     }
 
+    @Override
     public void clean() {
         root = null;
     }

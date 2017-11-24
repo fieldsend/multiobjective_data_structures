@@ -15,10 +15,10 @@ public class ProxySolution implements Solution
             objectives[i] = objectivesToCopy[i];
     }
     
-    @Override
+    /*@Override
     public double[] getFitness(){
         return objectives;
-    }
+    }*/
     
     @Override
     public double getFitness(int index){
@@ -52,5 +52,13 @@ public class ProxySolution implements Solution
             return isFitnessTheSame((Solution) o);
         }
         return false;
+    }
+    
+    @Override 
+    public String toString() {
+        String s = "Objective Values-- ";
+        for (double d : objectives)
+            s+= " : " + d;
+        return s;    
     }
 }

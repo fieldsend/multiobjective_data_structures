@@ -236,12 +236,6 @@ public class MTQuadTree1 implements ParetoSetManager
         return;    
     }
 
-    @Override
-    public Solution getRandomMember() {
-        Solution s = null;
-
-        return s;
-    }
 
     @Override
     public int size() {

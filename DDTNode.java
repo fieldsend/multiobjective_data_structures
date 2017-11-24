@@ -13,8 +13,17 @@ class DDTNode
     private int indexAtParent;
     
     DDTNode(Solution cargo, DDTNode parent, int indexAtParent) {
+        this(cargo);
+        setParent(parent, indexAtParent);
+    }
+    
+    DDTNode(Solution cargo) {
         this.cargo = cargo;
         children = new DDTNode[cargo.getNumberOfObjectives()];
+    }
+    
+    void setParent(DDTNode parent, int indexAtParent) {
+        this.parent = parent;
         this.indexAtParent = indexAtParent;
     }
     
@@ -26,6 +35,10 @@ class DDTNode
         return children[index];
     }
     
+    DDTNode getParent() {
+        return parent;
+    }
+    
     void setChild(int index, DDTNode node) {
         children[index] = node;
     }
@@ -34,12 +47,21 @@ class DDTNode
         return cargo;
     }
     
-    void delete() {
-        parent.children[indexAtParent] = null;
+    void detach() {
+        if (parent!=null)
+            parent.children[indexAtParent] = null;
     }
     
-    void deleteAndReplace(DDTNode replacement) {
-        parent.children[indexAtParent] = replacement;
+    /**
+     * Returns true if detached node is not top of tree (has a parent)
+     * Otherwise returns false
+     */
+    boolean detachAndReplace(DDTNode replacement) {
+        if (parent!=null) {
+            parent.children[indexAtParent] = replacement;
+            return true;
+        }
+        return false;
     }
     
     // can do this more efficiently at a memory and tracking cost

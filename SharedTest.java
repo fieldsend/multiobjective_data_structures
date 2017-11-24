@@ -41,14 +41,16 @@ public class SharedTest
                     System.out.print(toAdd[ii]+ "  ");
                 System.out.println();
             }*/
-            /*
+            
             for (Solution s : set2) {
                 toAdd = s.getFitness();
                 System.out.println("member Linear List: "+ s+" "+ toAdd[0]+ "  " + toAdd[1]);
-            }*/
+            }
             // now check contents match    
             System.out.println(set1.size());
             System.out.println(set2.size());
+            
+            assertTrue(list.size()==linearList.size());
             assertTrue(set1.size()==set2.size());
             assertTrue(set2.containsAll(set1));
             assertTrue(set1.containsAll(set2)); //WHY CAUSING ERROR?

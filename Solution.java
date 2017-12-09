@@ -25,6 +25,39 @@ interface Solution {
         return false;     
     }
     
+    default int getParetoOrder(Solution s){
+        boolean anyBetter=false;
+        boolean anyWorse=false;
+        int i = 0;
+        firstLoop : for (; i < getNumberOfObjectives(); i++) {
+            if (getFitness(i) < s.getFitness(i)) {
+                anyBetter = true;
+                break firstLoop;
+            }
+            if (getFitness(i) > s.getFitness(i)) {
+                anyWorse = true;
+                break firstLoop;
+            }
+        }
+        if (anyBetter) { // found one better
+            for (; i < getNumberOfObjectives(); i++) {
+                if (getFitness(i) > s.getFitness(i)) {
+                    return 0; // mutually non-dominating
+                }
+            }
+            return -1;
+        } else if (anyWorse) { //found one worse
+            for (; i < getNumberOfObjectives(); i++) {
+                if (getFitness(i) < s.getFitness(i)) {
+                    return 0; // mutually non-dominating
+                }
+            }
+            return 1;
+        }
+        return -1; // all same, so weakly dominates
+    }
+    
+    
     default boolean[] better(Solution s){
         boolean[] array = new boolean[getNumberOfObjectives()];
         for (int i = 0; i < getNumberOfObjectives(); i++) {
@@ -42,6 +75,20 @@ interface Solution {
                 return false; // worse on an objective so can't dominate
         
         return true; // not worse on any objective, so must weakly dominate
+    }
+    
+    /**
+     * Teturns true if this Solution is better on all objectives than s. See e.g. Knowles et al.
+     * A tutorial on the Performance Assessment of Stochastic Multiobjective Optimizers, 
+     * ETH Zurich TIK-Report 214, 2006 for Strict Dominance definition.
+     * 
+     */
+    default boolean strictlyDominates(Solution s){
+        for (int i = 0; i < getNumberOfObjectives(); i++)
+            if (getFitness(i) >= s.getFitness(i))
+                return false; // not better on an objective, so can't strictly dominate
+        
+        return true; // better on all objectives
     }
     
     default boolean[] betterOrEqual(Solution s){

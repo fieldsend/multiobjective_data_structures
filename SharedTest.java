@@ -31,7 +31,7 @@ public class SharedTest
             System.out.println(list.size());
             System.out.println(linearList.size());
             
-            //System.out.println(list);
+            System.out.println(list);
             Collection<? extends Solution> set1 = list.getContents();
             Collection<? extends Solution> set2 = linearList.getContents();
             

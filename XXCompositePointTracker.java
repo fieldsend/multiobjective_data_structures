@@ -6,25 +6,35 @@ import java.util.TreeSet;
  * @author (your name) 
  * @version (a version number or a date)
  */
-class CompositePointTracker implements Solution
+class XXCompositePointTracker implements Solution
 {
-    private TreeSet<CompositePoint> dominatedTreeMembership = new TreeSet<>();
+    private TreeSet<XXCompositePoint> dominatedTreeMembership = new TreeSet<>();
     //private TreeSet<CompositePoint> nonDominatedTreeMembership = new TreeSet<>();
     private Solution trackedSolution;
 
-    CompositePointTracker(Solution trackedSolution) {
+    XXCompositePointTracker(Solution trackedSolution) {
         this.trackedSolution = trackedSolution;
     }
 
-    void addToDominatedTreeTracking(CompositePoint p) {
+    void addToDominatedTreeTracking(XXCompositePoint p) {
+        System.out.println("<<<TRACKING...ADDING " + p + " TO "+ this.getWrappedSolution());
         dominatedTreeMembership.add(p);
     }
 
+    void removeFromToDominatedTreeTracking(XXCompositePoint p) {
+        System.out.println("<<<TRACKING...REMOVING " + p + " FROM "+ this.getWrappedSolution());
+        dominatedTreeMembership.remove(p);
+    }
+    
+    void clearDominatedTreeTracking() {
+        dominatedTreeMembership.clear();
+    }
+    
     /*void addToNonDominatedTreeTracking(CompositePoint p) {
         nonDominatedTreeMembership.add(p);
     }*/
 
-    TreeSet<CompositePoint> getDominatedTreeMembership() {
+    TreeSet<XXCompositePoint> getDominatedTreeMembership() {
         return dominatedTreeMembership;
     }
     

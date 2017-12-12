@@ -8,15 +8,20 @@ import java.util.HashSet;
  */
 public class LLNonDominatedTree
 {
-    private CompositePoint head;
-    private CompositePoint tail;
+    private FETreeCompositePoint head;
+    private FETreeCompositePoint tail;
     private int size=0;
+    private int numberOfObjectives;
 
-    CompositePoint getBest() {
+    LLNonDominatedTree(int numberOfObjectives) {
+        this.numberOfObjectives = numberOfObjectives;
+    }
+
+    FETreeCompositePoint getBest() {
         return head;
     }
 
-    CompositePoint getWorst() {
+    FETreeCompositePoint getWorst() {
         return tail;
     }
 
@@ -24,31 +29,31 @@ public class LLNonDominatedTree
         return size;
     }
 
-    void add(CompositePointTracker trackedPoint) {
+    void add(FETreeSolutionWrapper trackedPoint) {
         System.out.println("In NDTree add");
-        
+
         if (size==0) {
             System.out.println("tree empty, new head and tail");
-            CompositePoint cp = new CompositePoint(trackedPoint);
+            FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,false);
             head = cp;
             tail = cp;
             size++;
             //trackedPoint.addToNonDominatedTreeTracking(cp);
         } else { // find first cp which does not weakly dominate argument
-            CompositePoint higherNode = getFirstNonWeaklyDominating(trackedPoint);
+            FETreeCompositePoint higherNode = getFirstNonWeaklyDominating(trackedPoint);
             System.out.println("higher node to use " + higherNode);
             if (higherNode==null)
                 insertNewPointAtTail(trackedPoint);
             else
                 insertNewPointInBody(trackedPoint,higherNode);
         }
-        
+
         if (sanityCheck()==false)
             throw new RuntimeException("at end of add");
     }
 
-    private void insertNewPointAtTail(CompositePointTracker trackedPoint) {
-        CompositePoint insertedNode = new CompositePoint(trackedPoint);
+    private void insertNewPointAtTail(FETreeSolutionWrapper trackedPoint) {
+        FETreeCompositePoint insertedNode = new FETreeCompositePoint(trackedPoint,false);
         System.out.println("INSERTED TAIL: " + insertedNode+ ", prev tail: "+ tail);
         insertedNode.setPrevious(tail);
         tail.setNext(insertedNode);
@@ -56,7 +61,7 @@ public class LLNonDominatedTree
         System.out.println("Error checking "+ sanityCheck());
         size++;
     }
-    
+
     private boolean sanityCheck() {
         if (head==null){
             if (tail!=null) {
@@ -67,7 +72,7 @@ public class LLNonDominatedTree
         }
         int l1=0;
         int l2=0;
-        CompositePoint node = head;
+        FETreeCompositePoint node = head;
         while (node.getNext()!=null) {
             node = node.getNext();
             l1++;
@@ -90,18 +95,19 @@ public class LLNonDominatedTree
         }
         return true;
     }
-    
-    private void insertNewPointInBody(CompositePointTracker trackedPoint, CompositePoint higherNode) {
-        CompositePoint insertedNode = new CompositePoint(trackedPoint.getNumberOfObjectives());
 
-        for (int i=0; i<trackedPoint.getNumberOfObjectives(); i++){
+    private void insertNewPointInBody(FETreeSolutionWrapper trackedPoint, FETreeCompositePoint higherNode) {
+        FETreeCompositePoint insertedNode = new FETreeCompositePoint(numberOfObjectives);
+
+        for (int i=0; i<numberOfObjectives; i++){
             if (higherNode.getFitness(i) < trackedPoint.getFitness(i)) {
-                insertedNode.setElement(i, higherNode.getElement(i));
-                //higherNode.getElement(i).addToNonDominatedTreeTracking(insertedNode);
+                if (higherNode.getElement(i)!=null) {// not going to infer from lower node, but move solution from higher
+                    insertedNode.setElement(i, higherNode.getElement(i));
+                    higherNode.inferElementFromPrevious(i);
+                } // if not infering from lower, don't need to do anything...
             } else {
                 insertedNode.setElement(i, trackedPoint);
             }
-            //trackedPoint.addToNonDominatedTreeTracking(insertedNode);
         }
         insertedNode.setNext(higherNode);
         insertedNode.setPrevious(higherNode.getPrevious());
@@ -113,55 +119,61 @@ public class LLNonDominatedTree
         size++;
     }
 
-    private CompositePoint getFirstNonWeaklyDominating(CompositePointTracker trackedPoint) {
-        CompositePoint node = head; // already checked head before this call, no need to check again
+    private FETreeCompositePoint getFirstNonWeaklyDominating(FETreeSolutionWrapper trackedPoint) {
+        FETreeCompositePoint node = head; // already checked head before this call, no need to check again
         while ((node!=null) && (node.weaklyDominates(trackedPoint)))
             node = node.getNext();
         return node;
     }
 
-    boolean getDominatedByInsertAndClean(CompositePointTracker trackedPoint, HashSet<CompositePointTracker> dominatedSet) {
+    /**
+     * Potential for dominatedSet to contain a null element
+     */
+    boolean getDominatedByInsertAndClean(FETreeSolutionWrapper trackedPoint, HashSet<FETreeSolutionWrapper> dominatedSet) {
         if (sanityCheck()==false)
             throw new RuntimeException("Sanity Check fail at start of insert and clean, tail disconnected");
-        
-        
+
         if (size==0)
             return false;
         // first clean all composite points which are strictly dominated
         while (trackedPoint.strictlyDominates(tail)) {
-            dominatedSet.addAll(tail.getUniqueElements());
-            for (CompositePointTracker t : tail.getUniqueElements())
-                System.out.println("DOMINATED in CP:  " +t.getWrappedSolution());
+            for (int i=0; i<numberOfObjectives; i++)
+                dominatedSet.add(tail.getElement(i));
             tail = tail.getPrevious();
             size--;
             if (tail==null) // tail was head, so tree cleaned out
                 return false;
             tail.setNext(null);
         }
-        // now process all those which do not strictly dominate s
+        // now process all composite points which do not strictly dominate s
         boolean inserted = false;
-        CompositePoint node = head;
-        while (node.strictlyDominates(trackedPoint)) {
-            node = node.getNext();
+        FETreeCompositePoint node = head;
+        // COULD BINARY SERACH HERE
+        while (node.strictlyDominates(trackedPoint))  {
+            if (node.getNext()!=null)
+                node = node.getNext();
+            else
+                return false; // got to tail and tail does not strictly dominate trackedPoint
         }
         // node does not strictly dominate
         do {
             System.out.println("In check loop:");
-            for (int i=0; i<node.getNumberOfObjectives(); i++) {
-                if (trackedPoint.weaklyDominates(node.getElement(i))) {
-                    System.out.println("DOMINATED:  " +node.getElement(i).getWrappedSolution());
-                    dominatedSet.add(node.getElement(i));
-                    if (node.getPrevious()!=null){ // if node is not head
-                        node.setElement(i, node.getPrevious().getElement(i));
-                        //node.getPrevious().getElement(i).addToNonDominatedTreeTracking(node);
-                    } else { // node is, point is dominated so tracked point must have better value
-                        node.setElement(i, trackedPoint);
-                        //trackedPoint.addToNonDominatedTreeTracking(node);
-                        inserted = true;
+            for (int i=0; i<numberOfObjectives; i++) {
+                if (node.getElement(i)!=null) { // if null, already checked in a lower node, so no need to pull
+                    if (trackedPoint.weaklyDominates(node.getElement(i))) {
+                        System.out.println("DOMINATED:  " +node.getElement(i).getWrappedSolution());
+                        dominatedSet.add(node.getElement(i));
+                        if (node.getPrevious()!=null){ // if node is not head
+                            node.inferElementFromPrevious(i);
+                        } else { // node is, point is dominated so tracked point must have better value
+                            node.setElement(i, trackedPoint);
+                            inserted = true;
+                        }
                     }
                 }
             }
-            if (node.isDuplicatingPrevious()) { // remove any duplicate nodes
+            if (node.getNumberOfStoredSolutions()==0) { // no contents unqiue to this node
+                System.out.println("REMOVING DUPLICATE: "+ this);
                 if (node == tail) {
                     tail = tail.getPrevious();
                     tail.setNext(null);
@@ -173,11 +185,13 @@ public class LLNonDominatedTree
                     node = node.getNext();
                 }
                 size--;
+
+                System.out.println("DUPLICATE REMOVED: "+ this);
             } else {
                 node = node.getNext();
             }
         } while (node!=null);
-        
+
         if (sanityCheck()==false)
             throw new RuntimeException("Sanity Check fail at end of insert and clean, tail disconnected " + size);
         return inserted;
@@ -186,7 +200,7 @@ public class LLNonDominatedTree
     @Override
     public String toString() {
         String text = "";
-        CompositePoint node = head;
+        FETreeCompositePoint node = head;
         while (node!=null) {
             text += node + "...";
             node = node.getNext();

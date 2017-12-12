@@ -8,7 +8,7 @@ import java.util.Collections;
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class NonDominatedTree
+public class XXNonDominatedTree
 {/*
     // tree set is ordered from most dominated (first) to that which dominates all others (last)
     private TreeSet<CompositePoint> tree = new TreeSet<>(Collections.reverseOrder()); 

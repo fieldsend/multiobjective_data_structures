@@ -78,7 +78,7 @@ interface Solution {
     }
     
     /**
-     * Teturns true if this Solution is better on all objectives than s. See e.g. Knowles et al.
+     * Returns true if this Solution is better on all objectives than s. See e.g. Knowles et al.
      * A tutorial on the Performance Assessment of Stochastic Multiobjective Optimizers, 
      * ETH Zurich TIK-Report 214, 2006 for Strict Dominance definition.
      * 

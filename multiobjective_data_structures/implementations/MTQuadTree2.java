@@ -33,13 +33,13 @@ public class MTQuadTree2 extends MTQuadTree1
 
     /* returns true if added, false otherwise */
     private boolean recursivelyAddProcess(Solution s, MTQuadTreeNode n, ArrayList<MTQuadTreeNode> toReinsert) {
-        System.out.println("In RecAddProc "+ numberOfElements+" "+ s + " " +n.getCargo());
+        //System.out.println("In RecAddProc "+ numberOfElements+" "+ s + " " +n.getCargo());
         // calculate k-sucessorship STEP 2 in M&T paper
         int index = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         if (index==MAX_INDEX) // solution dominated so discard
             return false;
 
-        if (index==MIN_INDEX){ // node is dominated, so will have to be removed and  all its children reinserted
+        if ((index==MIN_INDEX) || (s.equalIndex(n.getCargo(),elementWeights) == index)){ // node is dominated, so will have to be removed and  all its children reinserted
             dominationFlag = true;
             MTQuadTreeNode[] childrenOfDominatedNode = n.getChildren();
             n.setCargoAndCleanChildren(s); // one added and one removed, so no changed of numberOfElements necessary
@@ -87,7 +87,7 @@ public class MTQuadTree2 extends MTQuadTree1
     private void reInsert(ArrayList<MTQuadTreeNode> toReinsert, MTQuadTreeNode n) {
         for (MTQuadTreeNode c : toReinsert) {
             c.cleanChildren(); // all children will have been recursively processed by now
-            System.out.println("REINSERTING " +  c.getCargo());
+            //System.out.println("REINSERTING "+ numberOfElements+" " +  c.getCargo());
             reInsert(c,n);
         }
         dominationFlag = false;
@@ -102,7 +102,7 @@ public class MTQuadTree2 extends MTQuadTree1
             return;
         } else { //replace root with k-child, then compare c to this as the new root
             //last argument is false as at this point all c's orginal children have been stripped off
-            //and checked, and the counter alreday updated with c's removal
+            //and checked, and the counter already updated with c's removal
             reInsert(c, n.getChild(index));
             return;
         }
@@ -116,25 +116,26 @@ public class MTQuadTree2 extends MTQuadTree1
                 recursivelyExtractToReInsert(toReinsert, potentialDominator,c.getChild(i),n); // add child (and its children) from n as parent
         }
         numberOfElements--; //remove from count as (currently) no longer in tree    
-        System.out.println("In RecExtractCheck "+ numberOfElements+" " +potentialDominator + " " + c.getCargo());
+        //System.out.println("In RecExtractCheck "+ numberOfElements+" " +potentialDominator + " " + c.getCargo());
         
         //If got to this point then no children for node remaining to be processed
-        int index = potentialDominator.worseOrEqualIndex(c.getCargo(),elementWeights);
-        if (index==0) // solution dominated by putative solution so discard
+        //int index = potentialDominator.worseOrEqualIndex(c.getCargo(),elementWeights);
+        //if ((index==MIN_INDEX) || (potentialDominator.equalIndex(c.getCargo(),elementWeights) == index)) // solution dominated by putative solution so discard
+        if (potentialDominator.dominates(c.getCargo()))    
             return;
         toReinsert.add(c);  
     }
 
     /* remove any dominated nodes and add any non-dominated children to list for reinsertion*/
     private void recursiveDominatesCheck(ArrayList<MTQuadTreeNode> toReinsert, Solution s, MTQuadTreeNode child, MTQuadTreeNode parent, int index, boolean dominatedPath) {
-        System.out.println("In RecDomsCheck "+ + numberOfElements+" "+s + " " + child.getCargo() + " dom path "+ dominatedPath);
+        //System.out.println("In RecDomsCheck " + numberOfElements+" "+s + " " + child.getCargo() + " dom path "+ dominatedPath);
         
-        int k = s.worseOrEqualIndex(child.getCargo(),elementWeights);
-        if (k==0) { // sucessor is dominated by s, so remove and check all children
+        //int k = s.worseOrEqualIndex(child.getCargo(),elementWeights);
+        if (s.dominates(child.getCargo())) { // sucessor is dominated by s, so remove and check all children
             dominationFlag = true;
             parent.removeChild(index);
             numberOfElements--;
-            System.out.println("REMOVING DOMINATED " + child.getCargo());
+            //System.out.println("REMOVING DOMINATED " + child.getCargo());
             for (int l=MIN_INDEX+1; l<MAX_INDEX; l++)
                 if (child.getChild(l)!=null)
                     recursiveDominatesCheck(toReinsert,s,child.getChild(l),child,l,true);
@@ -142,9 +143,9 @@ public class MTQuadTree2 extends MTQuadTree1
             return;
         }
         // child is not dominated
-        
+        int k = s.worseOrEqualIndex(child.getCargo(),elementWeights);
         if (dominatedPath) {
-            System.out.println("REMOVING FOR REINSERTION " + child.getCargo());
+            //System.out.println("REMOVING FOR REINSERTION " + child.getCargo());
             toReinsert.add(child); // track for reinsertion if a parent in the path has been marked for removal
             numberOfElements--;
             for (int l=MIN_INDEX+1; l<MAX_INDEX; l++)

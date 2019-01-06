@@ -79,6 +79,22 @@ public interface Solution {
         return true; // not worse on any objective, so must weakly dominate
     }
     
+    static boolean weaklyDominates(double[] d, Solution s){
+        for (int i = 0; i < s.getNumberOfObjectives(); i++)
+            if (d[i] > s.getFitness(i))
+                return false; // worse on an objective so can't dominate
+        
+        return true; // not worse on any objective, so must weakly dominate
+    }
+    
+    static boolean weaklyDominates(Solution s, double[] d){
+        for (int i = 0; i < s.getNumberOfObjectives(); i++)
+            if (s.getFitness(i) > d[i])
+                return false; // worse on an objective so can't dominate
+        
+        return true; // not worse on any objective, so must weakly dominate
+    }
+    
     /**
      * Returns true if this Solution is better on all objectives than s. See e.g. Knowles et al.
      * A tutorial on the Performance Assessment of Stochastic Multiobjective Optimizers, 
@@ -113,6 +129,15 @@ public interface Solution {
         return array;     
     }
     
+    default ArrayList<Integer> equalObjectives(Solution s){
+        ArrayList<Integer> array = new ArrayList<>(getNumberOfObjectives());
+        int j=0;
+        for (int i = 0; i < getNumberOfObjectives(); i++) 
+            if (getFitness(i) == s.getFitness(i))
+                array.add(j++);
+        return array;     
+    }
+    
     default ArrayList<Integer> worseOrEqualObjectives(Solution s){
         ArrayList<Integer> array = new ArrayList<>(getNumberOfObjectives());
         int j=0;
@@ -135,6 +160,19 @@ public interface Solution {
         return val; 
     }
     
+    /**
+     * calculates a weighted value depending on which objectives this Solution is greater 
+     * or equal to argument s on
+     */
+    default int equalIndex(Solution s, int elementWeights[]) {
+        int val = 0;
+        for (int i = 0; i < getNumberOfObjectives(); i++) 
+            if (getFitness(i) == s.getFitness(i))
+                val+=elementWeights[i];
+        
+        return val; 
+    }
+    
     default boolean isFitnessTheSame(Solution s) {
         for (int i = 0; i < getNumberOfObjectives(); i++) 
             if (getFitness(i) != s.getFitness(i))
@@ -142,6 +180,4 @@ public interface Solution {
         
         return true; 
     }
-    
-    
 }

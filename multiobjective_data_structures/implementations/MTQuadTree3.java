@@ -88,7 +88,7 @@ public class MTQuadTree3 extends MTQuadTree1
         if (index==MAX_INDEX) // solution dominated so discard
             return false;
 
-        if (index==MIN_INDEX){ // node is dominated, so will have to be removed and  all its children reinserted
+        if ((index==MIN_INDEX) || (s.equalIndex(n.getCargo(),elementWeights)==index)){ // node is dominated, so will have to be removed and  all its children reinserted
             replace(n,s);
             return true;
         }
@@ -124,7 +124,7 @@ public class MTQuadTree3 extends MTQuadTree1
         
         int index = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         int[] potentialDominated;
-        if (index==0) {// solution dominates so discard
+        if ((index==MIN_INDEX) || (s.equalIndex(n.getCargo(),elementWeights)==index)) {// solution dominates so discard
             delete(n,parent,indexOfChild);
             // the indexOfChild node child of parent has now changed, 
             // potentially also dominated

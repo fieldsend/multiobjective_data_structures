@@ -34,9 +34,12 @@ public class LinearListManager implements ParetoSetManager
     
     private void removeDominated(Solution s) throws IllegalNumberOfObjectivesException
     {
-        for (int i=contents.size()-1; i>=0; i--)
-            if (s.dominates(contents.get(i)))
+        for (int i=contents.size()-1; i>=0; i--) {
+            if (s.dominates(contents.get(i))) {
+                //System.out.println("Dominated: " + contents.get(i));
                 contents.remove(i);
+            }
+        }
     }
     
     public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException

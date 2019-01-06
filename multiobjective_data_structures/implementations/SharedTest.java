@@ -24,40 +24,37 @@ public class SharedTest
             double[] toAdd = new double[OBJECTIVE_NUMBER];
             for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
                 toAdd[ii] = (double) rng.nextInt(100);
-            //System.out.print("Query point: ");
+            /*System.out.print("Query point: ");
             for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
                 System.out.print(toAdd[ii]+ "  ");
-            //System.out.println();
+            */
+            System.out.println();
                 //System.out.println(toAdd[0]+ "  " + toAdd[1]);
             System.out.println("Test manager added "+list.add(new ProxySolution(toAdd)));
             System.out.println("Linear list added "+linearList.add(new ProxySolution(toAdd)));
-            System.out.println(list.size());
-            System.out.println(linearList.size());
+            System.out.println("Manager size: " + list.size());
+            System.out.println("Linear list size: " + linearList.size());
             
-            System.out.println(list);
+            //System.out.println(list);
             Collection<? extends Solution> set1 = list.getContents();
             Collection<? extends Solution> set2 = linearList.getContents();
             
             /*for (Solution s : set1) {
-                toAdd = s.getFitness();
-                System.out.print("member Quad Tree: " + s+" ");
-                for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
-                    System.out.print(toAdd[ii]+ "  ");
-                System.out.println();
-            }*/
+                System.out.println("member Tree: " + s);
+            }
             
-            /*for (Solution s : set2) {
+            for (Solution s : set2) {
                 System.out.println(s);
             }*/
             // now check contents match    
-            System.out.println(set1.size());
-            System.out.println(set2.size());
+            //System.out.println(set1.size());
+            //System.out.println(set2.size());
             
             assertTrue(list.size()==linearList.size());
             assertTrue(set1.size()==set2.size());
             assertTrue(set2.containsAll(set1));
             assertTrue(set1.containsAll(set2)); //WHY CAUSING ERROR?
-            }
+        }
         
         System.out.println(list.size());
     }

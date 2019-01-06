@@ -74,33 +74,35 @@ public class MTQuadTree1 implements ParetoSetManager
     /* returns true if added, false otherwise */
     private boolean recursivelyAddProcess(Solution s, MTQuadTreeNode n) {
         // calculate k-sucessorship STEP 2 in M&T paper
+        //System.out.println("Step 2");
         int index = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         if (index==MAX_INDEX) // solution dominated so discard
             return false;
 
-        if (index==MIN_INDEX){ // node is dominated, so will have to be removed and  all its children reinserted
+        if ((index==MIN_INDEX) || (s.equalIndex(n.getCargo(),elementWeights) == index)){ // node is dominated, so will have to be removed and  all its children reinserted
             MTQuadTreeNode[] childrenOfDominatedNode = n.getChildren();
-            n.setCargoAndCleanChildren(s); // one added and one removed, so no changed of numberOfElements necessary
+            n.setCargoAndCleanChildren(s); // one added and one removed, so no changed of numberOfElements necessary 
             for (MTQuadTreeNode child : childrenOfDominatedNode){ 
                 if (child!=null)
-                    recursivelyReInsert(s,child,n,true); // add child (at it's children) from n as parent
+                    recursivelyReInsert(s,child,n,true); // add child (at its children) from n as parent
             }
             return true;
         }
-        //check if dominated by any sucessors STEP 3 in M&T paper
+        //System.out.println("Step 3");
         int[] potentialDominators = getLchildrenSet0IndicesLessThanK(index);
+        //check if dominated by any sucessors STEP 3 in M&T paper
         for (int l : potentialDominators) 
             if (n.getChild(l)!=null)
                 if (recursiveDominatedCheck(s,n.getChild(l)))
                     return false;
-
+        //System.out.println("Step 4");
         // check if proposed solution dominates any sucessors, if so delete it and reinsert all its children 
         // STEP 4 in M&T paper
         int[] potentialDominated = getLchildrenSet1IndicesLessThanL(index);
         for (int l : potentialDominated) 
             if (n.getChild(l)!=null)
                 recursiveDominatesCheck(s,n,l);
-
+        //System.out.println("Step 5");
         //check if dominates by sucessor at matching index, and add if necessary
         // STEP 5 in M&T paper
         if (n.getChild(index)==null){
@@ -192,17 +194,17 @@ public class MTQuadTree1 implements ParetoSetManager
 
     /* remove any dominated nodes and re-add any non-dominated children*/
     private void recursiveDominatesCheck(Solution s, MTQuadTreeNode n, int index) {
-        int k = s.worseOrEqualIndex(n.getChild(index).getCargo(),elementWeights);
-        if (k==0) { // sucessor is dominated by s, so remove and reinsert all children from global root
+        if (s.dominates(n.getChild(index).getCargo())) { // sucessor is dominated by s, so remove and reinsert all children from global root
             MTQuadTreeNode[] childrenOfDominatedNode = n.getChild(index).getChildren();
             n.removeChild(index);
             numberOfElements--;
             for (MTQuadTreeNode child : childrenOfDominatedNode){ 
                 if (child!=null)
-                    recursivelyReInsert(s,child,root,true); // add child (at it's children) from root
+                    recursivelyReInsert(s,child,root,true); // add child (and its children) from root
             }
             return;
         }
+        int k = s.worseOrEqualIndex(n.getChild(index).getCargo(),elementWeights);
         int[] potentialDominated = getLchildrenSet1Indices(k);
         
         for (int l : potentialDominated) 

@@ -58,7 +58,7 @@ public class MTHelperClass
                   
         }
 
-        printMatrices(MIN_INDEX, MAX_INDEX, lChildrenSet0IndicesLessThanK,lChildrenSet1IndicesLessThanL,lChildrenSet0Indices,lChildrenSet1Indices);
+        //printMatrices(MIN_INDEX, MAX_INDEX, lChildrenSet0IndicesLessThanK,lChildrenSet1IndicesLessThanL,lChildrenSet0Indices,lChildrenSet1Indices);
     }
 
     static void printMatrices(int MIN_INDEX, int MAX_INDEX, int[][] lChildrenSet0IndicesLessThanK, int[][] lChildrenSet1IndicesLessThanL, int[][] lChildrenSet0Indices, int[][] lChildrenSet1Indices) {

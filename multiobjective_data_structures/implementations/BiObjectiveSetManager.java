@@ -54,7 +54,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
         // extract substree from first potential dominated point onwards
         SortedSet<ComparableSolutionSingleValue> subTree = contents.tailSet(n);
         Iterator<ComparableSolutionSingleValue> iterator = subTree.iterator();
-        // now iterator over this, reoving each dominated element in turn, until first non-dominated element 
+        // now iterator over this, removing each dominated element in turn, until first non-dominated element 
         // reached, in which case break out
         while (iterator.hasNext()){
             ComparableSolutionSingleValue e = iterator.next();
@@ -79,11 +79,6 @@ public class BiObjectiveSetManager implements ParetoSetManager
     @Override
     public Solution getRandomMember() throws UnsupportedOperationException
     {
-        throw new UnsupportedOperationException();
-    }
-    
-    /*public Solution getRandomMember()
-    {
         if (contents.size()==0)
             return null;
         if (contents.size()==1)
@@ -99,7 +94,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
         Solution mock = new ProxySolution(new double[]{(d+offset)*range+head.getFitness(0)-offset*range, 0});
         
         return contents.higher(new ComparableSolutionSingleValue(mock,0)); //return contents.size()==0 ? null : contents.get(Random.nextInt(contents.size()));
-    }*/
+    }
     
     @Override
     public int size()

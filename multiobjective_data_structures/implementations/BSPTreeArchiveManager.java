@@ -16,10 +16,16 @@ import java.util.Iterator;
 public class BSPTreeArchiveManager implements ParetoSetManager
 {
     private BSPTreeNode root;
-    private int maxLeafSize;
+    private int maxLeafSize = 20;
     private final int NUMBER_OF_OBJECTIVES;
+    private double rebalanceFactor = 6; // called 'z' in the original paper
 
-    BSPTreeArchiveManager(int numberOfObjectives, int maxLeafSize) {
+    private BSPTreeArchiveManager(int numberOfObjectives) {
+        root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
+        NUMBER_OF_OBJECTIVES = numberOfObjectives;
+    }
+    
+    private BSPTreeArchiveManager(int numberOfObjectives, int maxLeafSize) {
         root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
         this.maxLeafSize = maxLeafSize;
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
@@ -29,13 +35,15 @@ public class BSPTreeArchiveManager implements ParetoSetManager
     public boolean add(Solution s) throws IllegalNumberOfObjectivesException
     {
         if (s.getNumberOfObjectives() != NUMBER_OF_OBJECTIVES)
-            throw new IllegalNumberOfObjectivesException("ARchive maintains solutions with " 
+            throw new IllegalNumberOfObjectivesException("Archive maintains solutions with " 
                 + NUMBER_OF_OBJECTIVES + " number of objectives, not " + s.getNumberOfObjectives());
         if (checkDominance(root,s,new TreeSet<Integer>(),new TreeSet<Integer>()) < 0 )
             return false;
         BSPTreeNode node =  root;
         while (node.isInteriorNode()) {
             node.incrementNumberCovered();
+            if (node.isImbalanced(rebalanceFactor)) // check if node has reached a state needing rebalancing
+                node.rebalance(maxLeafSize); // rebalance before processing further
             node = node.getChild(s);
         }
         node.addToSet(s,maxLeafSize);
@@ -232,6 +240,6 @@ public class BSPTreeArchiveManager implements ParetoSetManager
     }
 
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
-        return new BSPTreeArchiveManager(numberOfObjectives,1);
+        return new BSPTreeArchiveManager(numberOfObjectives);
     }
 }

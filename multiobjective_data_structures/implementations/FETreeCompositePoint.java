@@ -13,6 +13,7 @@ import java.util.HashSet;
 public class FETreeCompositePoint implements Solution, Comparable<FETreeCompositePoint>
 {
     private FETreeSolutionWrapper[] solutions;
+    private int[] deepNodeSolutions; // only used in head
     private FETreeCompositePoint previous;
     private FETreeCompositePoint next;
     private int numberOfStoredSolutions=0;
@@ -23,15 +24,63 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
 
     FETreeCompositePoint(FETreeSolutionWrapper s, boolean dominatedTreeNode) {
         solutions = new FETreeSolutionWrapper[s.getNumberOfObjectives()];
-        for (int i=0; i< solutions.length; i++)
-            solutions[i] = s;  
-        numberOfStoredSolutions = s.getNumberOfObjectives();
-        if (dominatedTreeNode)
+        //for (int i=0; i< solutions.length; i++)
+        // all other entries null, as only generation from constructor like this is 
+        // for head of tree or for tail
+        solutions[0] = s; 
+        numberOfStoredSolutions = 1;
+        deepNodeSolutions = new int[s.getNumberOfObjectives()]; // track that index 0 feeds all criteria 
+        deepNodeSolutions[0]=-1;
+        for (int i=1; i< solutions.length; i++) // set up links for deep node solutions
+                deepNodeSolutions[i] = 0;
+        
+        if (dominatedTreeNode) {
             s.setDominatedTreeCompositeMember(this);
+            for (int i=0; i< solutions.length; i++)
+                solutions[i] = s;
+            numberOfStoredSolutions = s.getNumberOfObjectives();
+        }
     }
 
+    
+    FETreeCompositePoint(FETreeSolutionWrapper s, int index, boolean dominatedTreeNode) {
+        solutions = new FETreeSolutionWrapper[s.getNumberOfObjectives()];
+        //for (int i=0; i< solutions.length; i++)
+        // all other entries null, as only generation from constructor like this is 
+        // for head of tree or for tail
+        solutions[index] = s; 
+        numberOfStoredSolutions = 1;
+        deepNodeSolutions = new int[s.getNumberOfObjectives()]; // track that index 0 feeds all criteria 
+        deepNodeSolutions[index]=-1;
+        for (int i=0; i< solutions.length; i++) // set up links for deep node solutions
+            if (i != index)
+                deepNodeSolutions[i] = 0;
+        
+        if (dominatedTreeNode) {
+            s.setDominatedTreeCompositeMember(this);
+            for (int i=0; i< solutions.length; i++)
+                solutions[i] = s;
+            numberOfStoredSolutions = s.getNumberOfObjectives();
+        }
+    }
+    
+    void instantiateDeepNodeSolutions() {
+        deepNodeSolutions = new int[solutions.length]; // make space if new head is being formed 
+    }
+    
+    void setDeepNodeSolution(int index, int deepIndex) {
+        deepNodeSolutions[index] = deepIndex;
+    }
+    
     int getNumberOfStoredSolutions() {
         return numberOfStoredSolutions;
+    }
+    
+    void cleanDeepLinks() {
+        deepNodeSolutions = null;
+    }
+    int getDeepIndex(int index) {
+        return deepNodeSolutions[index];
     }
     
     void setPrevious(FETreeCompositePoint previous) {
@@ -50,6 +99,9 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         return next;
     }
     
+    boolean activeElement(int index) {
+        return solutions[index]!=null;
+    }
     
     /*
      * Will only compare to physically stored elements in this node, if using backwards reference 
@@ -71,12 +123,14 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         }
         solutions[index] = s;
     }
-
+    
+    
+    
     void inferElementFromPrevious(int index) {
         if (solutions[index]!=null) {
             numberOfStoredSolutions--;
+            solutions[index] = null;
         }
-        solutions[index] = null;
     }
 
     /** 
@@ -86,9 +140,18 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         return solutions[index];
     }
 
+    
+    /*FETreeSolutionWrapper getDeepElement(int index) {
+        return solutions[ deepNodeSolutions[index] ];
+    }*/
+    
     private FETreeSolutionWrapper getDeepElement(int index) {
-        if (solutions[index]==null)
-            return previous.getDeepElement(index);
+        if (solutions[index]==null) {
+            if (previous == null) // special case where at head of tree
+                return solutions[ deepNodeSolutions[index] ];
+            else
+                return previous.getDeepElement(index);
+        }
         return solutions[index];
     }
 
@@ -103,30 +166,35 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
                     inferElementFromPrevious(i);
             
             if (numberOfStoredSolutions==0) { // remove any node if duplicate
-                System.out.println("~~~~DUPLICATE REMOVAL");
+                //System.out.println("~~~~DUPLICATE REMOVAL DT");
                 if (this == tree.getWorst()) // if tail
                     tree.removeWorst();
                 else
                     tree.removeComponent(this);
             } 
-            return false;
+            return false; // dominator not inserted
         } 
-        System.out.println("REMOVING FROM HEAD");
+        //System.out.println("REMOVING FROM HEAD");
         // this composite point is the head of the list
-        System.out.println("CP HEAD "+ this);
+        //System.out.println("CP HEAD "+ this);
         for (int i=0; i<solutions.length; i++)
             if (solutions[i] == toRemove) 
-                solutions[i] = dominator;
+                solutions[i] = dominator; 
+        // any deep node index links are automatically now pointing to dominator, so nothing further to be done
+            
         dominator.setDominatedTreeCompositeMember(this);
-                
-        return true;
+        return true; // dominator now inserted
     }
 
     @Override 
     public String toString() {
         String s = "Objective Values-- ";
-        for (int i=0; i<getNumberOfObjectives(); i++) 
-            s+= " : " + getFitness(i);
+        for (int i=0; i<getNumberOfObjectives(); i++) {
+            if (solutions[i]!=null)
+                s+= " : " + getFitness(i);
+            else
+                s+= " : null";
+        }
         return s;    
     }
 
@@ -134,6 +202,8 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
     public double getFitness(int index){
         if (solutions[index]!=null)
             return solutions[index].getFitness(index); 
+        if (previous == null) // special case where at head of tree
+            return solutions[ deepNodeSolutions[index] ].getFitness(index);
         return previous.getFitness(index);
     }
 
@@ -142,7 +212,7 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         if (solutions[index]!=null)
             solutions[index].setFitness(index,value);
         else
-            previous.setFitness(index,value);
+            previous.setFitness(index,value); // cascade up down towards head to find a non-null to replace
     }
 
     @Override
@@ -167,8 +237,8 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
     public int compareTo(FETreeCompositePoint c) {
         if (this==c)
             return 0;
-        System.out.println("this comparitor" + this);
-        System.out.println("argument comparitor" +  c);
+        //System.out.println("this comparitor" + this);
+        //System.out.println("argument comparitor" +  c);
         /*if (this.queryPoint){ // could do by type...
         if (this.strictlyDominates(c))
         return -1;

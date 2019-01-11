@@ -12,7 +12,7 @@ import java.util.Collections;
  */
 public class BSPTreeNode
 {
-    private Solution cargo;
+    //private Solution cargo;
     private BSPTreeNode left;
     private BSPTreeNode right;
     private BSPTreeNode parent;
@@ -97,6 +97,47 @@ public class BSPTreeNode
         return right;
     }
 
+    boolean isImbalanced(double z) {
+        if ((left.getNumberCovered() > z*right.getNumberCovered()) || (right.getNumberCovered() > z*left.getNumberCovered()))
+            return true;
+        return false;    
+    }
+    
+    // pull in contents from smaller child and re-distribute
+    void rebalance(int maxLeafSize) {
+        ArrayList<Solution> setToReinsert;
+        if (left.getNumberCovered() > right.getNumberCovered()) {
+            setToReinsert = new ArrayList<>(right.getNumberCovered());
+            setCovered = left.setCovered;
+            right.extractSubTreeContents(setToReinsert);
+        } else {
+            setToReinsert = new ArrayList<>(left.getNumberCovered());
+            setCovered = right.setCovered;
+            left.extractSubTreeContents(setToReinsert);
+        }
+        
+        left = null;
+        right = null;
+        numberCovered -= setToReinsert.size();
+        // now reinsert everything from this node down
+        for (Solution s : setToReinsert) {
+            BSPTreeNode node = this;
+            while (node.isInteriorNode()) {
+                node = node.getChild(s);
+            }
+            node.addToSet(s,maxLeafSize);
+        }
+    }
+    
+    private void extractSubTreeContents(ArrayList<Solution> setToReinsert) {
+        if (this.isInteriorNode()) {
+            left.extractSubTreeContents(setToReinsert);
+            right.extractSubTreeContents(setToReinsert);
+        } else {
+            setToReinsert.addAll(setCovered);
+        }
+    }
+    
     void addToSet(Solution s, int maxLeafSize) {
         setCovered.add(s);
         numberCovered++;

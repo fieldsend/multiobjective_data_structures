@@ -1,25 +1,27 @@
 package multiobjective_data_structures.implementations;
 
 import multiobjective_data_structures.*;
+
 import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.Random;
-
+import java.util.Collection;
 /**
- * The test class NDTreeTest.
+ * The test class MTQuadTree3Test.
  *
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class NDTreeTest
+public class FListsManagerTest
 {
     private int numberOfQueries = 2000;
+    
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public NDTreeTest()
+    public FListsManagerTest()
     {
     }
 
@@ -45,36 +47,36 @@ public class NDTreeTest
     
     @Test
     public void testSize(){
-        ParetoSetManager list = NDTree.managerFactory(2);
+        ParetoSetManager list = FListsManager.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
     
-    @Test(timeout=200000)
+    @Test(timeout=20000)
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(NDTree.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd3()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 3;
-        SharedTest.exampleRun(NDTree.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(NDTree.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(NDTree.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
 }

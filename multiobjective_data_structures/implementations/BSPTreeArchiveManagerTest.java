@@ -56,27 +56,27 @@ public class BSPTreeArchiveManagerTest
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd3()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 3;
-        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,10),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
 }

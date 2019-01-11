@@ -27,8 +27,8 @@ public class SharedTest
             /*System.out.print("Query point: ");
             for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
                 System.out.print(toAdd[ii]+ "  ");
-            */
-            System.out.println();
+            
+            System.out.println();*/
                 //System.out.println(toAdd[0]+ "  " + toAdd[1]);
             System.out.println("Test manager added "+list.add(new ProxySolution(toAdd)));
             System.out.println("Linear list added "+linearList.add(new ProxySolution(toAdd)));
@@ -47,8 +47,8 @@ public class SharedTest
                 System.out.println(s);
             }*/
             // now check contents match    
-            //System.out.println(set1.size());
-            //System.out.println(set2.size());
+            System.out.println("Test manager extracted set size "+ set1.size());
+            System.out.println("Linear list extracted set size "+set2.size());
             
             assertTrue(list.size()==linearList.size());
             assertTrue(set1.size()==set2.size());

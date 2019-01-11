@@ -14,10 +14,17 @@ import java.util.List;
 public class NDTree implements ParetoSetManager
 {
     private NDTreeNode root;
-    private int maxListSizePerNode = 10;
-    private int numberOfChildrenPerNode = 10;
+    private int maxListSizePerNode = 20;
+    private int numberOfChildrenPerNode;
     
-    private NDTree() {
+    private NDTree(int numberOfObjectives) {
+        numberOfChildrenPerNode = numberOfObjectives + 1;
+        root = new NDTreeNode(maxListSizePerNode,numberOfChildrenPerNode);
+    }
+    
+    private NDTree(int maxListSizePerNode, int numberOfChildrenPerNode) {
+        this.maxListSizePerNode = maxListSizePerNode;
+        this.numberOfChildrenPerNode = numberOfChildrenPerNode;
         root = new NDTreeNode(maxListSizePerNode,numberOfChildrenPerNode);
     }
     
@@ -80,7 +87,7 @@ public class NDTree implements ParetoSetManager
     }
     
     
-    public static ParetoSetManager managerFactory() {
-        return new NDTree();
+    public static ParetoSetManager managerFactory(int numberOfObjectives) {
+        return new NDTree(numberOfObjectives);
     }
 }

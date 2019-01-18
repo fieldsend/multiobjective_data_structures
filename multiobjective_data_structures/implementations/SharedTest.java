@@ -16,6 +16,29 @@ import java.util.Collection;
 public class SharedTest
 {
     static void exampleRun(ParetoSetManager list, Random rng, int OBJECTIVE_NUMBER, int numberOfQueries) throws IllegalNumberOfObjectivesException {
+        
+        for (int i=0; i<numberOfQueries; i++){
+            System.out.println("QUERY: " + i);
+            
+            double[] toAdd = new double[OBJECTIVE_NUMBER];
+            for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
+                toAdd[ii] = (double) rng.nextInt(100);
+            /*System.out.print("Query point: ");
+            for (int ii=0; ii < OBJECTIVE_NUMBER; ii++)
+                System.out.print(toAdd[ii]+ "  ");
+            
+            System.out.println();*/
+                //System.out.println(toAdd[0]+ "  " + toAdd[1]);
+            System.out.println("Test manager added "+list.add(new ProxySolution(toAdd)));
+            System.out.println("Manager size: " + list.size());
+            
+            
+        }
+        
+        System.out.println(list.size());
+    }
+    
+    static void exampleRun2(ParetoSetManager list, Random rng, int OBJECTIVE_NUMBER, int numberOfQueries) throws IllegalNumberOfObjectivesException {
         ParetoSetManager linearList = LinearListManager.managerFactory(0L,OBJECTIVE_NUMBER);
         
         for (int i=0; i<numberOfQueries; i++){

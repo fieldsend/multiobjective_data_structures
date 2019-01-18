@@ -14,14 +14,14 @@ import java.util.Collection;
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class FListsManagerTest
+public class MaxFListsManagerTest
 {
     private int numberOfQueries = 2000;
     
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public FListsManagerTest()
+    public MaxFListsManagerTest()
     {
     }
 
@@ -47,7 +47,7 @@ public class FListsManagerTest
     
     @Test
     public void testSize(){
-        ParetoSetManager list = FListsManager.managerFactory(2);
+        ParetoSetManager list = MaxFListsManager.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
@@ -56,27 +56,27 @@ public class FListsManagerTest
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MaxFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd3()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 3;
-        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MaxFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MaxFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(FListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MaxFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
 }

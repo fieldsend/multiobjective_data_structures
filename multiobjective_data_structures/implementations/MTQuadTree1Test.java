@@ -57,6 +57,14 @@ public class MTQuadTree1Test
         SharedTest.exampleRun(MTQuadTree1.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
+    
+    @Test(timeout=200000)
+    public void testAdd3()
+    throws IllegalNumberOfObjectivesException {
+        int objectiveNumber = 3;
+        SharedTest.exampleRun(MTQuadTree1.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+    }
+    
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {

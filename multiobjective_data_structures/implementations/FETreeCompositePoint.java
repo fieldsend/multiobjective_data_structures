@@ -32,13 +32,13 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         deepNodeSolutions = new int[s.getNumberOfObjectives()]; // track that index 0 feeds all criteria 
         deepNodeSolutions[0]=-1;
         for (int i=1; i< solutions.length; i++) // set up links for deep node solutions
-                deepNodeSolutions[i] = 0;
+            deepNodeSolutions[i] = 0;
         
         if (dominatedTreeNode) {
             s.setDominatedTreeCompositeMember(this);
-            for (int i=0; i< solutions.length; i++)
-                solutions[i] = s;
-            numberOfStoredSolutions = s.getNumberOfObjectives();
+            //for (int i=0; i< solutions.length; i++)
+            //    solutions[i] = s;
+            //numberOfStoredSolutions = s.getNumberOfObjectives();
         }
     }
 
@@ -58,9 +58,6 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         
         if (dominatedTreeNode) {
             s.setDominatedTreeCompositeMember(this);
-            for (int i=0; i< solutions.length; i++)
-                solutions[i] = s;
-            numberOfStoredSolutions = s.getNumberOfObjectives();
         }
     }
     
@@ -159,11 +156,15 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
      * Returns true if dominator used to replace solution at all
      */
     boolean cleanAndReplaceDominatedTree(LLDominatedTree tree, FETreeSolutionWrapper toRemove, FETreeSolutionWrapper dominator) {
-       if (previous!=null) {
+       if (previous!=null) { // if not at head
             int index=0;
-            for (int i=0; i<solutions.length; i++) 
-                if (solutions[i] == toRemove) 
+            for (int i=0; i<solutions.length; i++) {
+                if (solutions[i] == toRemove) {
                     inferElementFromPrevious(i);
+                    tree.decrementActiveCount(i);
+                    break; // should only appear once, so can break here
+                }
+            }
             
             if (numberOfStoredSolutions==0) { // remove any node if duplicate
                 //System.out.println("~~~~DUPLICATE REMOVAL DT");
@@ -174,13 +175,51 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
             } 
             return false; // dominator not inserted
         } 
-        //System.out.println("REMOVING FROM HEAD");
+        // AT HEAD
+        
+        //System.out.println("REMOVING FROM HEAD AND INSERTING");
         // this composite point is the head of the list
         //System.out.println("CP HEAD "+ this);
-        for (int i=0; i<solutions.length; i++)
-            if (solutions[i] == toRemove) 
-                solutions[i] = dominator; 
-        // any deep node index links are automatically now pointing to dominator, so nothing further to be done
+        
+        // need to process any deep links here as the removed pint may be responsible
+        
+        
+        int numberOfElements = 1;
+        int[] indicesCoveredByRemoved = new int[solutions.length];
+        int minCovered = Integer.MAX_VALUE;
+        int index = -1;
+        
+        for (int i=0; i<solutions.length; i++) {
+            if (solutions[i] == toRemove) {
+                indicesCoveredByRemoved[0] = i;
+                break;
+            }
+        }
+        
+        
+        for (int i=0; i<solutions.length; i++) 
+            if (solutions[i]==null)
+                if (deepNodeSolutions[i] == indicesCoveredByRemoved[0]) 
+                    indicesCoveredByRemoved[numberOfElements++] = i; 
+        
+        int[] active = tree.getNonNullElementsOnEachObjective();
+        for (int i=0; i<numberOfElements; i++) {
+            if (active[ indicesCoveredByRemoved[i] ] < minCovered)  {
+                index = indicesCoveredByRemoved[i];
+                minCovered = active[ index ];
+            }
+        }
+        solutions[ indicesCoveredByRemoved[0] ] = null;
+        solutions[index] = dominator; 
+        deepNodeSolutions[index] = -1;
+        // redirect deep links
+        for (int i=0; i<numberOfElements; i++) 
+            if (indicesCoveredByRemoved[i] != index)  
+                deepNodeSolutions[ indicesCoveredByRemoved[i] ] = index;
+            
+        tree.decrementActiveCount(indicesCoveredByRemoved[0]); // where deleted point was
+        tree.incrementActiveCount(index); // where new point inserted
+        // any deep node index links are  now pointing to dominator, so nothing further to be done
             
         dominator.setDominatedTreeCompositeMember(this);
         return true; // dominator now inserted

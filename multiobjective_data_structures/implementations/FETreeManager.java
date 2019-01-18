@@ -40,8 +40,8 @@ public class FETreeManager implements ParetoSetManager
             for (int i : checker)
                 System.out.print(i + ", ");
             System.out.println("-----------------");
-            //System.out.println(nonDominatedTree);
-            //System.out.println(dominatedTree);
+            System.out.println(nonDominatedTree);
+            System.out.println(dominatedTree);
         }*/
         // if over twice as long as minimum possible, then reduce
         if (nonDominatedTree.size() > 1.2*nonDominatedTree.getMaxActiveElements()){
@@ -49,21 +49,26 @@ public class FETreeManager implements ParetoSetManager
             //System.out.println("NDTree: "+ nonDominatedTree);
             //System.out.println("NDTree: "+ nonDominatedTree.toCompleteString());
             //System.out.println("COMPRESSING NDT");
-            System.out.println("-----DTREE, length " +dominatedTree.size());
-            System.out.println("NDTREE, length " +nonDominatedTree.size());
+            //System.out.println("-----DTREE, length " +dominatedTree.size());
+            //System.out.println("NDTREE, length " +nonDominatedTree.size());
             nonDominatedTree.compress();
-            System.out.println("COMPRESSED NDTREE, length " +nonDominatedTree.size());
+            //System.out.println("COMPRESSED NDTREE, length " +nonDominatedTree.size());
             //System.out.println("NDTree: "+ nonDominatedTree);
             //System.out.println("NDTree: "+ nonDominatedTree.toCompleteString());
         }
-        System.out.println("NDTREE, length " +nonDominatedTree.size());
-        System.out.println("DDTREE, length " +dominatedTree.size());
-            
+        /*System.out.println("NDTREE, length " +nonDominatedTree.size());
+        System.out.println("DTREE, length " +dominatedTree.size());
+        System.out.println(nonDominatedTree);
+        System.out.println(dominatedTree);    
+        System.out.println("NDTree: "+ nonDominatedTree.toCompleteString());
+        System.out.println("DTree: "+ dominatedTree.toCompleteString());
+        */
+       
         // if over twice as long as minimum possible, then reduce
-        /*if (dominatedTree.size() > 2*(numberStored/numberOfObjectives)){
-            System.out.println("COMPRESSING DT");
+        if (dominatedTree.size() > 1.2*dominatedTree.getMaxActiveElements()){
+            //System.out.println("COMPRESSING DT");
             dominatedTree.compress();
-        }*/
+        }
         
         if (s.getNumberOfObjectives() != numberOfObjectives)
             throw new IllegalNumberOfObjectivesException();

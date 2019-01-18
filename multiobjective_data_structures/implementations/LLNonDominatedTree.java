@@ -109,19 +109,6 @@ public class LLNonDominatedTree
     }
 
     int[] getActiveElementsOnEachObjective() {
-        /*int[] tracker = new int[numberOfObjectives+1];
-        for (int i=0; i< tracker.length; i++)
-            tracker[i] = 0;
-
-        FETreeCompositePoint node = head; 
-        while (node!=null) {
-            if (node.getNumberOfStoredSolutions()==0)
-                tracker[numberOfObjectives]++;
-            for (int i=0; i< numberOfObjectives; i++)
-                if (node.getElement(i) != null)
-                    tracker[i]++;
-            node = node.getNext();
-        }*/
         return numberOfActiveElements;
     }
 
@@ -132,6 +119,7 @@ public class LLNonDominatedTree
                 m = numberOfActiveElements[i];
         return m;
     }
+    
     void add(FETreeSolutionWrapper trackedPoint) {
         //System.out.println("In NDTree add");
         

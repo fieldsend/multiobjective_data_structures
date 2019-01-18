@@ -1,4 +1,5 @@
 package multiobjective_data_structures.implementations;
+
 import multiobjective_data_structures.*;
 
 import static org.junit.Assert.*;
@@ -6,22 +7,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.Random;
-
+import java.util.Collection;
 /**
- * The test class LinearListManagerTest.
+ * The test class MTQuadTree3Test.
  *
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class LinearListManagerTest
+public class MinFListsManagerTest
 {
-    private ParetoSetManager list;
-    private Random rng;
     private int numberOfQueries = 2000;
+    
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public LinearListManagerTest()
+    public MinFListsManagerTest()
     {
     }
 
@@ -33,8 +33,6 @@ public class LinearListManagerTest
     @Before
     public void setUp() throws IllegalNumberOfObjectivesException
     {
-        list = LinearListManager.managerFactory(0L,2);
-        rng = new Random(0L);
     }
 
     /**
@@ -45,55 +43,40 @@ public class LinearListManagerTest
     @After
     public void tearDown()
     {
-        list = null;
     }
     
     @Test
     public void testSize(){
+        ParetoSetManager list = MinFListsManager.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
     
-    @Test
-    public void testAdd()
-    throws IllegalNumberOfObjectivesException {
-        int number = 1000;
-        for (int i=0; i<number; i++){
-            list.add(new ProxySolution(new double[]{rng.nextGaussian(), rng.nextGaussian() }));
-        }
-        
-        System.out.println(list.size());
-    }
-    
-    
-    @Test(timeout=200000)
+    @Test(timeout=20000)
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(LinearListManager.managerFactory(0L,objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MinFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
-    
     
     @Test(timeout=200000)
     public void testAdd3()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 3;
-        SharedTest.exampleRun(LinearListManager.managerFactory(0L,objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MinFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(LinearListManager.managerFactory(0L,objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MinFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(LinearListManager.managerFactory(0L,objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(MinFListsManager.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
     }
-    
 }
-

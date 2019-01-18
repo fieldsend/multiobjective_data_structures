@@ -16,11 +16,21 @@ public class LLDominatedTree
     private FETreeCompositePoint tail;
     private int size=0;
     private int numberOfObjectives;
+    private int[] numberOfActiveElements;
 
     LLDominatedTree(int numberOfObjectives) {
         this.numberOfObjectives = numberOfObjectives;
+        numberOfActiveElements = new int[numberOfObjectives];
     }
 
+    void decrementActiveCount(int index) {
+        numberOfActiveElements[index]--;
+    }
+    
+    void incrementActiveCount(int index) {
+        numberOfActiveElements[index]++;
+    }
+    
     FETreeCompositePoint getBest() {
         return head;
     }
@@ -30,7 +40,7 @@ public class LLDominatedTree
     }
 
     int[] getNonNullElementsOnEachObjective() {
-       int[] tracker = new int[numberOfObjectives+1];
+       /*int[] tracker = new int[numberOfObjectives+1];
        for (int i=0; i< tracker.length; i++)
             tracker[i] = 0;
             
@@ -44,7 +54,8 @@ public class LLDominatedTree
                     tracker[i]++;
            node = node.getNext();
        }
-       return tracker;
+       return tracker;*/
+       return numberOfActiveElements;
     }
     
     
@@ -81,7 +92,7 @@ public class LLDominatedTree
         FETreeCompositePoint node = head;
         while (node!=null) {
             //System.out.println("Comparing to a DTree node elements " +  node);
-            if (s.strictlyDominates(node)) //node larger on all criteria, so no contributor can dominate s
+            if (s.strictlyDominates(node)) // reached a node worse on all criteria, so no contributor can dominate s
                 return false;
             if (node.anyElementWeaklyDominates(s))
                 return true;
@@ -92,7 +103,7 @@ public class LLDominatedTree
 
     
     /*
-     * Method concentinas the data structure by removing as many null elements as possible
+     * Method concertinas the data structure by removing as many null elements as possible
      */
     void compress() {
         List<List<FETreeSolutionWrapper>> listOfElements = new ArrayList<>(numberOfObjectives);
@@ -106,7 +117,7 @@ public class LLDominatedTree
             }
             listOfElements.add(elements);
         } 
-        // now replace current Non-dominated tree with compressed version, copy across to 
+        // now replace current Dominated tree with compressed version, copy across to 
         int maxLength = listOfElements.get(0).size();
         for (int i=1; i< numberOfObjectives; i++)
             if ((listOfElements.get(i)).size() > maxLength) 
@@ -118,7 +129,21 @@ public class LLDominatedTree
             offset[i] = maxLength-(listOfElements.get(i)).size();
         // reform tree
         FETreeCompositePoint node = head;
-        // skip the very first node, as this will always remain unchanged
+        // Process first node and replace any deep links that need to be removed
+        for (int i=0; i < numberOfObjectives; i++){
+            // deal with special case where the head current has a deep link to another element, but needs to replace
+            // with a compressed location from further up the old tree
+            if (!head.activeElement(i)) {
+                if ((listOfElements.get(i)).size()>0){
+                    FETreeSolutionWrapper s = (listOfElements.get(i)).get(0);
+                    head.setElement(i, s);
+                    head.setDeepNodeSolution(i, -1 );
+                    s.setDominatedTreeCompositeMember(node); // need to keep track of which dominated tree composite point this solution is in 
+                }
+            }
+        }
+        
+        // now do rest of the tree
         node = node.getNext();
         if (node!=null){
             for (int j=1; j<maxLength; j++){
@@ -128,7 +153,7 @@ public class LLDominatedTree
                     else {
                         FETreeSolutionWrapper s = (listOfElements.get(i)).get(j-offset[i]);
                         node.setElement(i,s);
-                        s.setDominatedTreeCompositeMember(node); // need to keep track of which DT CP this solution is in 
+                        s.setDominatedTreeCompositeMember(node); // need to keep track of which dominated tree composite point this solution is in 
                     }
                 }
                 tail = node;
@@ -141,15 +166,39 @@ public class LLDominatedTree
     
     
     
+    int getMaxActiveElements() {
+        int m = numberOfActiveElements[0];
+        for (int i=1; i< numberOfObjectives; i++)
+            if (numberOfActiveElements[i] > m)
+                m = numberOfActiveElements[i];
+        return m;
+    }
+    
+    private int getMaxNullElement() {
+        int i = 0;
+        int me = numberOfActiveElements[i];
+        for (int j=1; j<numberOfActiveElements.length; j++) {
+            if (numberOfActiveElements[j] < me) {
+                i = j;
+                me = numberOfActiveElements[j];
+            }
+        }
+        return i;
+    }
     
     void add(FETreeSolutionWrapper trackedPoint) {
         if (size==0) {
             FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,true);
+            this.numberOfActiveElements[0] = 1;
+            for (int i=1; i < numberOfObjectives; i++)
+                this.numberOfActiveElements[i] = 0;
             head = cp;
             tail = cp;
         } else {
             if (trackedPoint.weaklyDominates(head)) {
-                FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,true);
+                int index = getMaxNullElement();
+                FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,index,true);
+                this.numberOfActiveElements[index]++;
                 head.setPrevious(cp);
                 cp.setNext(head);
                 head = cp;
@@ -159,13 +208,22 @@ public class LLDominatedTree
                 if (lowerNode==null)
                     lowerNode = tail;
                 FETreeCompositePoint insertedNode = new FETreeCompositePoint(numberOfObjectives);
+                
+                int indexToInsert = -1;
+                int numberActive = Integer.MAX_VALUE;
+                
                 for (int i=0; i<numberOfObjectives; i++){
                     if (lowerNode.getFitness(i) <= trackedPoint.getFitness(i)) {
-                        insertedNode.setElement(i, trackedPoint);
+                        if (this.numberOfActiveElements[i] < numberActive) {
+                            indexToInsert = i;
+                            numberActive = numberOfActiveElements[i];
+                        }
                     } // don't do anything otherwise, as these values will be inferred from the previous
                 }
+                // indsert into element with fewest active elements
+                insertedNode.setElement(indexToInsert, trackedPoint);
+                numberOfActiveElements[indexToInsert]++;
                 trackedPoint.setDominatedTreeCompositeMember(insertedNode);
-
                 insertedNode.setNext(lowerNode.getNext());
                 insertedNode.setPrevious(lowerNode);
                 lowerNode.setNext(insertedNode);
@@ -210,6 +268,7 @@ public class LLDominatedTree
     int deletePossiblyInsert(FETreeSolutionWrapper toRemove, FETreeSolutionWrapper dominator) {
         int v = 0;
         FETreeCompositePoint c = toRemove.getDominatedTreeMembership();
+        
         //System.out.println("PROCESSING CP: " +  c);
         //System.out.println("TO REMOVE: " +  toRemove.getWrappedSolution());
         //System.out.println("CURRENT DTREE STATE: length" +  this.size() + ",  " + this);
@@ -313,5 +372,16 @@ public class LLDominatedTree
 
         return true;
     }
-
+    
+    public String toCompleteString() {
+        String text = "";
+        FETreeCompositePoint node = head;
+        while (node!=null) {
+            text += " -- V :";
+            for (int i=0; i<numberOfObjectives; i++) 
+                text += node.getFitness(i) + ", ";
+            node = node.getNext();
+        }
+        return text;
+    }
 }

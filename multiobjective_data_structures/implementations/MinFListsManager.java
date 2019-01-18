@@ -1,8 +1,6 @@
 package multiobjective_data_structures.implementations;
 
 import multiobjective_data_structures.*;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * Write a description of class MinFlistsManager here.
@@ -10,146 +8,53 @@ import java.util.ArrayList;
  * @author (your name) 
  * @version (a version number or a date)
  */
-public abstract class FListsManager implements ParetoSetManager
+public class MinFListsManager extends FListsManager
 {
-    final int NUMBER_OF_OBJECTIVES;
-    int listToInsertOn;
-    int[] numberProcessedBetter;
+    MinFListsManager(int numberOfObjectives) 
+    {
+        super(numberOfObjectives);
+    }
+    
+    public static MinFListsManager managerFactory(int numberOfObjectives) 
+    {
+        return new MinFListsManager(numberOfObjectives);
+    }
+
+    void trackList(CriteriaNode processed, int numberProcessed, int listIndex) 
+    {
+        // select list which is shortest
+        listToInsertOn = 0;
+        for (int i = 1; i < NUMBER_OF_OBJECTIVES; i++)
+            if (numberProcessedBetter[i] < numberProcessedBetter[listToInsertOn])
+                listToInsertOn = i;
+    }
+    
+    
+    /*int[] numberProcessedBetter;
     CriteriaNode[] processedBetter;
-    CriteriaNode[] linkedListHeads;
-    CriteriaNode[] linkedListTails;
-    int[] listLengths;
+    CriteriaNode[] processedEqual;
 
-    // numberOfObjectives lists of doubly-linked CriteriaNodes
-    // ordered by each criteria. Each solution is in only *one* of these lists
-    // head of list is lowest (best) stored on that criteria. Tail of list is 
-    // highest (worst) on that criteria
-
-    class CriteriaNode {
-        CriteriaNode prev;
-        CriteriaNode next;
-        Solution cargo;
-
-        boolean better(Solution s, int activeCriterion) {
-            return cargo.getFitness(activeCriterion) < s.getFitness(activeCriterion);
-        }
-
-        boolean betterOrEqual(Solution s, int activeCriterion) {
-            return cargo.getFitness(activeCriterion) <= s.getFitness(activeCriterion);
-        }
-
-        boolean equals(Solution s, int activeCriterion) {
-            return cargo.getFitness(activeCriterion) == s.getFitness(activeCriterion);
-        }
-        
-        CriteriaNode(Solution cargo) {
-            this.cargo = cargo;
-        }
-        
-        @Override
-        public String toString() 
-        {
-            String text = "Tree: ";
-            CriteriaNode node = this;
-            do {
-                text += "  -- " +node.cargo;
-                node = node.next;
-            } while(node != null);
-            return text;
-        }
-    }
-
-    FListsManager(int numberOfObjectives) {
-        this.NUMBER_OF_OBJECTIVES = numberOfObjectives;
-        this.linkedListHeads = new CriteriaNode[numberOfObjectives];
-        this.linkedListTails = new CriteriaNode[numberOfObjectives];
-        this.processedBetter = new CriteriaNode[numberOfObjectives];
-        this.listLengths = new int[numberOfObjectives];
-        this.numberProcessedBetter = new int[numberOfObjectives];
-    }
-    
-    
-    private int getIndexOfShortestList() {
-        int index = 0;
-        int shortest = listLengths[0];
-        for (int i = 1; i< NUMBER_OF_OBJECTIVES; i++) {
-            if (listLengths[i] < shortest){
-                shortest = listLengths[i];
-                index = i;
-            }
-        }
-        return index;
+    MinFListsManager(int n) {
+        super(n);
+        numberProcessedBetter = new int[n];
+        processedBetter = new CriteriaNode[n];
+        processedEqual = new CriteriaNode[n];
     }
 
     public boolean add(Solution s) throws IllegalNumberOfObjectivesException 
     {
         if (weaklyDominates(s))
             return false;
+        // numberProcessedBetter array now holds number processed in each list until 
+        // a worse (larger) or equal solution found on the corresponding criteria
+        // processedBetter holds this corresponding node
+        // can process from this point onwards in removeDominated
         removeDominated(s);
-        
         addToLowestList(s);
+        //for (int i = 0; i < numberOfObjectives; i++)
+        //    System.out.println(linkedListHeads[i] + " :LL: " + listLengths[i]);
         return true;
     }
-
-    public Collection<? extends Solution> getContents()
-    {
-        ArrayList<Solution> contents = new ArrayList<Solution>();
-        for (CriteriaNode node : linkedListHeads) {
-            while (node != null){
-                contents.add(node.cargo);
-                node = node.next;
-            }
-        }
-        return contents;
-    }
-
-    public int size() {
-        int size = 0;
-        for (int i : listLengths)
-            size += i;
-        return size;
-    }
-
-    public void clean() {
-        this.linkedListHeads = new CriteriaNode[NUMBER_OF_OBJECTIVES];
-        this.linkedListTails = new CriteriaNode[NUMBER_OF_OBJECTIVES];
-        this.listLengths = new int[NUMBER_OF_OBJECTIVES];
-    }
-
-    public Solution getRandomMember() throws UnsupportedOperationException 
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String toString() {
-        String text = "";
-        for (CriteriaNode node : linkedListHeads) {
-            while (node != null){
-                text += "- item: " + node.cargo;
-                node = node.next;
-            }
-            text += "\n";
-        }
-        text += "HEADS: ";
-        for (CriteriaNode c : linkedListHeads){
-            if (c != null)
-                text += c.cargo + " - item: ";
-            else
-                text += "null - item: ";
-        }
-        text += "\nTAILS: ";
-        for (CriteriaNode c : linkedListTails){
-            if (c != null)
-                text += c.cargo + " - item: ";
-            else
-                text += "null - item: ";
-        }
-                
-        return text+"\n";
-    }
-   
-    abstract void trackList(CriteriaNode processed, int numberProcessed, int listIndex);
 
     public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException
     {
@@ -157,10 +62,10 @@ public abstract class FListsManager implements ParetoSetManager
             
         // go from best value up to first worse on each criteria in each list
         // check if cargo dominates the argument 
-        for (int i = 0; i < NUMBER_OF_OBJECTIVES; i++){
+        for (int i = 0; i < numberOfObjectives; i++){
             //System.out.println(linkedListHeads[i]+ " :LL: " + listLengths[i]);
             numberProcessedBetter[i] = 0;
-            processedBetter[i] = linkedListHeads[i];
+            processedBetter[i]  = linkedListHeads[i];
             // go through all points with better values on objective i
             while (processedBetter[i]!=null){ // if null, then reached tail, so move to next list
                 if (processedBetter[i].better(s,i)){
@@ -174,14 +79,14 @@ public abstract class FListsManager implements ParetoSetManager
                     break; 
                 }
             }
-            CriteriaNode processed = processedBetter[i];
             // now go through all points equal on objective i
-            while (processed!=null){ // if null, then reached tail, so move to next list
-                if (processed.equals(s,i)){
-                    if (processed.cargo.weaklyDominates(s)){
+            processedEqual[i] = processedBetter[i];
+            while (processedEqual[i]!=null){ // if null, then reached tail, so move to next list
+                if (processedEqual[i].equals(s,i)){
+                    if (processedEqual[i].cargo.weaklyDominates(s)){
                         return true;
                     }
-                    processed = processed.next;
+                    processedEqual[i] = processedEqual[i].next;
                 } else {
                     // reached a point now worse on criteria, so this cargo and rest of 
                     // this list cannot possibly weakly dominate
@@ -199,7 +104,7 @@ public abstract class FListsManager implements ParetoSetManager
         // go from the tail of each list toward the head, checking each member to see 
         // if dominated by s and if so remove, stop processing list when value reached 
         // which is better on objective
-        for (int i = 0; i < NUMBER_OF_OBJECTIVES; i++) {
+        for (int i = 0; i< numberOfObjectives; i++) {
             CriteriaNode node = processedBetter[i]; // set to first node found that wasn't better on objective
             if (node!=null)
                 processedBetter[i] = node.prev; // now points toward last node to be better -- needed by addToLowestList
@@ -236,6 +141,11 @@ public abstract class FListsManager implements ParetoSetManager
         // ADD TO LIST where objective value is lowest (in terms of number of elements better)
         
         
+        // get list index to insert on
+        int listToInsertOn = 0;
+        for (int i = 1; i< numberOfObjectives; i++) 
+            if (numberProcessedBetter[i] < numberProcessedBetter[listToInsertOn])
+                listToInsertOn = i;
         // make node to insert        
         CriteriaNode nodeToInsert = new CriteriaNode(s);
         // check point wasn't top
@@ -272,4 +182,9 @@ public abstract class FListsManager implements ParetoSetManager
         //System.out.println(this);
         listLengths[listToInsertOn]++;
     }
+    
+    
+    public static MinFListsManager managerFactory(int numberOfObjectives) {
+        return new MinFListsManager(numberOfObjectives);
+    }*/
 }

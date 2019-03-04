@@ -1,4 +1,4 @@
-package multiobjective_data_structures.implementations;
+package multiobjective_data_structures.implementations.tests;
 import multiobjective_data_structures.*;
 
 /**

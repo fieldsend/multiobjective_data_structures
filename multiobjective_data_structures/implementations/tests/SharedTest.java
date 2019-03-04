@@ -1,5 +1,7 @@
-package multiobjective_data_structures.implementations;
+package multiobjective_data_structures.implementations.tests;
 import multiobjective_data_structures.*;
+import multiobjective_data_structures.implementations.LinearListManager;
+
 
 import static org.junit.Assert.*;
 import org.junit.After;
@@ -15,7 +17,7 @@ import java.util.Collection;
  */
 public class SharedTest
 {
-    static void exampleRun(ParetoSetManager list, Random rng, int OBJECTIVE_NUMBER, int numberOfQueries) throws IllegalNumberOfObjectivesException {
+    public static void exampleRun(ParetoSetManager list, Random rng, int OBJECTIVE_NUMBER, int numberOfQueries) throws IllegalNumberOfObjectivesException {
         
         for (int i=0; i<numberOfQueries; i++){
             System.out.println("QUERY: " + i);
@@ -38,7 +40,7 @@ public class SharedTest
         System.out.println(list.size());
     }
     
-    static void exampleRun2(ParetoSetManager list, Random rng, int OBJECTIVE_NUMBER, int numberOfQueries) throws IllegalNumberOfObjectivesException {
+    public static void exampleRun2(ParetoSetManager list, Random rng, int OBJECTIVE_NUMBER, int numberOfQueries) throws IllegalNumberOfObjectivesException {
         ParetoSetManager linearList = LinearListManager.managerFactory(0L,OBJECTIVE_NUMBER);
         
         for (int i=0; i<numberOfQueries; i++){
@@ -76,7 +78,7 @@ public class SharedTest
             assertTrue(list.size()==linearList.size());
             assertTrue(set1.size()==set2.size());
             assertTrue(set2.containsAll(set1));
-            assertTrue(set1.containsAll(set2)); //WHY CAUSING ERROR?
+            assertTrue(set1.containsAll(set2));
         }
         
         System.out.println(list.size());

@@ -1,5 +1,7 @@
 package multiobjective_data_structures.implementations;
 import multiobjective_data_structures.*;
+import multiobjective_data_structures.implementations.tests.SharedTest;
+import multiobjective_data_structures.implementations.tests.EvolutionStrategyTest;
 
 import static org.junit.Assert.*;
 import org.junit.After;
@@ -77,5 +79,13 @@ public class MTQuadTree3Test
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
         SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+    }
+    
+    @Test
+    public void testES()
+    throws IllegalNumberOfObjectivesException {
+        int objectiveNumber = 5;
+        EvolutionStrategyTest.exampleRunDTLZ(MTQuadTree3.managerFactory(objectiveNumber), 
+            new Random(0L),objectiveNumber,objectiveNumber-1+9, 2, 10000);  
     }
 }

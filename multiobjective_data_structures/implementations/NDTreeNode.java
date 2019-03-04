@@ -198,7 +198,7 @@ public class NDTreeNode
                         children.remove(n); // detach this node and all subcomponents from tree
                     }
                 }*/
-                if (children.size()==1) { // replace current node state with child state, and detact remaining child for gargage collection
+                if (children.size()==1) { // replace current node state with child state, and detatch remaining child for gargage collection
                     //System.out.println("Replacing current state with remaining child state");
                     NDTreeNode child = children.get(0);
                     this.list = child.list;

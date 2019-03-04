@@ -107,24 +107,31 @@ public class BSPTreeNode
     void rebalance(int maxLeafSize) {
         ArrayList<Solution> setToReinsert;
         if (left.getNumberCovered() > right.getNumberCovered()) {
+            // left subtree is larger, so set this covered as left covered, and reinsert right subtree
             setToReinsert = new ArrayList<>(right.getNumberCovered());
             setCovered = left.setCovered;
             right.extractSubTreeContents(setToReinsert);
+            // disconnect left and right, and replace
+            right = left.right;
+            left = left.left;   
         } else {
             setToReinsert = new ArrayList<>(left.getNumberCovered());
             setCovered = right.setCovered;
             left.extractSubTreeContents(setToReinsert);
+            // disconnect left and right, and replace
+            left = right.left;
+            right = right.right;   
         }
         
-        left = null;
-        right = null;
-        numberCovered -= setToReinsert.size();
+        numberCovered -= setToReinsert.size(); // need to avoid double-counting we reinserting
         // now reinsert everything from this node down
         for (Solution s : setToReinsert) {
+            // traverse down to leaf
             BSPTreeNode node = this;
             while (node.isInteriorNode()) {
                 node = node.getChild(s);
             }
+            // insert at leaf
             node.addToSet(s,maxLeafSize);
         }
     }

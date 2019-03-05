@@ -65,7 +65,13 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         deepNodeSolutions = new int[solutions.length]; // make space if new head is being formed 
     }
     
+    void activateDeepNodeSolution(int index, FETreeSolutionWrapper s) {
+        setElement(index, s);
+        deepNodeSolutions[index] = -1;
+    }
+    
     void setDeepNodeSolution(int index, int deepIndex) {
+        solutions[index] = null;
         deepNodeSolutions[index] = deepIndex;
     }
     
@@ -156,7 +162,8 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
      * Returns true if dominator used to replace solution at all
      */
     boolean cleanAndReplaceDominatedTree(LLDominatedTree tree, FETreeSolutionWrapper toRemove, FETreeSolutionWrapper dominator) {
-       if (previous!=null) { // if not at head
+        //System.out.println("IN CLEAN AND REPLACE >>>>>>>>>>>>");
+        if (previous!=null) { // if not at head
             int index=0;
             for (int i=0; i<solutions.length; i++) {
                 if (solutions[i] == toRemove) {
@@ -177,7 +184,7 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         } 
         // AT HEAD
         
-        //System.out.println("REMOVING FROM HEAD AND INSERTING");
+        // System.out.println("REMOVING FROM HEAD AND INSERTING");
         // this composite point is the head of the list
         //System.out.println("CP HEAD "+ this);
         
@@ -239,7 +246,13 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
 
     @Override
     public double getFitness(int index){
-        if (solutions[index]!=null)
+        /*for (int i=0; i< solutions.length; i++) {
+            System.out.println(i);
+            System.out.println(deepNodeSolutions[i]);
+            System.out.println(solutions[i]);
+        }
+        System.out.println();*/
+        if (solutions[index] != null)
             return solutions[index].getFitness(index); 
         if (previous == null) // special case where at head of tree
             return solutions[ deepNodeSolutions[index] ].getFitness(index);

@@ -53,6 +53,12 @@ public class EvolutionStrategyTest
         for (int i=1; i<iterations; i++) {
             DTLZSolution child = evolve(s,rng);
             child.evaluate(problem);
+            
+            System.out.print("Child : ");
+            for (int j=0; j<numberOfObjectives; j++)
+                System.out.print(child.getFitness(j) + ", ");
+            System.out.println();
+            
             if (list.add(child)) {
                 assertTrue(linearList.add(child));
                 s = child;
@@ -60,9 +66,6 @@ public class EvolutionStrategyTest
                 assertFalse(linearList.add(child));
             }
             System.out.println("iteration: "+ i + ", archive size: " +  list.size());
-            for (int j=0; j<numberOfObjectives; j++)
-                System.out.print(child.getFitness(j) + ", ");
-            System.out.println();
             checkEqualStates(list, linearList);
         }
         
@@ -73,8 +76,14 @@ public class EvolutionStrategyTest
     private static void checkEqualStates(ParetoSetManager list, ParetoSetManager linearList){
         Collection<? extends Solution> set1 = list.getContents();
         Collection<? extends Solution> set2 = linearList.getContents();
-        assertTrue(list.size()==linearList.size());
-        assertTrue(set1.size()==set2.size());
+        for (Solution s : set1){
+            for (int j=0; j<s.getNumberOfObjectives(); j++){
+                System.out.print(s.getFitness(j) + ", ");
+            }
+            System.out.println();
+        }
+        assertTrue("list size is: "+ list.size() +", linear list size is: "+ linearList.size(), list.size()==linearList.size());
+        assertTrue("list (set) size is: "+ set1.size() +", linear list (set) size is: "+ set2.size(), set1.size()==set2.size());
         assertTrue(set2.containsAll(set1));
         assertTrue(set1.containsAll(set2));
     }

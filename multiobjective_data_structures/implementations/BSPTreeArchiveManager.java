@@ -44,6 +44,7 @@ public class BSPTreeArchiveManager implements ParetoSetManager
             node.incrementNumberCovered();
             if (node.isImbalanced(rebalanceFactor)) // check if node has reached a state needing rebalancing
                 node.rebalance(maxLeafSize); // rebalance before processing further
+            
             node = node.getChild(s);
         }
         node.addToSet(s,maxLeafSize);

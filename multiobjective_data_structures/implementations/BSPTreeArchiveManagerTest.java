@@ -85,7 +85,7 @@ public class BSPTreeArchiveManagerTest
     @Test
     public void testES()
     throws IllegalNumberOfObjectivesException {
-        int objectiveNumber = 5;
+        int objectiveNumber = 10;
         EvolutionStrategyTest.exampleRunDTLZ(BSPTreeArchiveManager.managerFactory(objectiveNumber,20), 
             new Random(0L),objectiveNumber,objectiveNumber-1+9, 2, 10000);  
     }

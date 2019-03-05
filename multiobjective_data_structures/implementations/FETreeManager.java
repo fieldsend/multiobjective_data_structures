@@ -48,7 +48,7 @@ public class FETreeManager implements ParetoSetManager
             //System.out.println("NDTREE, length " +nonDominatedTree.size() + "ceil 2x opt length" + Math.ceil(2*(numberStored/(double) numberOfObjectives)));
             //System.out.println("NDTree: "+ nonDominatedTree);
             //System.out.println("NDTree: "+ nonDominatedTree.toCompleteString());
-            //System.out.println("COMPRESSING NDT");
+            System.out.println("COMPRESSING NDT");
             //System.out.println("-----DTREE, length " +dominatedTree.size());
             //System.out.println("NDTREE, length " +nonDominatedTree.size());
             nonDominatedTree.compress();
@@ -66,7 +66,7 @@ public class FETreeManager implements ParetoSetManager
        
         // if over twice as long as minimum possible, then reduce
         if (dominatedTree.size() > 1.2*dominatedTree.getMaxActiveElements()){
-            //System.out.println("COMPRESSING DT");
+            System.out.println("COMPRESSING DT");
             dominatedTree.compress();
         }
         
@@ -91,7 +91,7 @@ public class FETreeManager implements ParetoSetManager
             //System.out.println("DTree: "+ dominatedTree);
 
             if (insertedCount == 0) {
-                //System.out.println("ADDING...");
+                System.out.println("ADDING..." + trackedPoint);
                 dominatedTree.add(trackedPoint);
             }
             // add new member to length

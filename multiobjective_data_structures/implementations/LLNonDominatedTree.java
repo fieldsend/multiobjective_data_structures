@@ -82,8 +82,7 @@ public class LLNonDominatedTree
             // with a compressed location from further up the old tree
             if (!head.activeElement(i)) {
                 if ((listOfElements.get(i)).size()>0){
-                    head.setElement(i,(listOfElements.get(i)).get(0));
-                    head.setDeepNodeSolution(i, -1 );
+                    head.activateDeepNodeSolution(i,(listOfElements.get(i)).get(0));
                 }
             }
         }
@@ -121,7 +120,6 @@ public class LLNonDominatedTree
     }
     
     void add(FETreeSolutionWrapper trackedPoint) {
-        //System.out.println("In NDTree add");
         
         if (size==0) {
             //System.out.println("tree empty, new head and tail");
@@ -391,7 +389,9 @@ public class LLNonDominatedTree
                                 insertedCriterion = i;
                                 this.numberOfActiveElements[i]++;
                             } else {
+                                //System.out.println("DOMINATED:  " +node.getElement(i).getWrappedSolution());
                                 node.setDeepNodeSolution(i,insertedCriterion);
+                                //System.out.println("REPLACED:  " +node.getElement(i).getWrappedSolution());
                             }
                         }
                     }

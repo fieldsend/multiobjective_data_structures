@@ -136,8 +136,8 @@ public class LLDominatedTree
             if (!head.activeElement(i)) {
                 if ((listOfElements.get(i)).size()>0){
                     FETreeSolutionWrapper s = (listOfElements.get(i)).get(0);
-                    head.setElement(i, s);
-                    head.setDeepNodeSolution(i, -1 );
+                    //System.out.println("Setting: " + i + " " + s);
+                    head.activateDeepNodeSolution(i, s);
                     s.setDominatedTreeCompositeMember(node); // need to keep track of which dominated tree composite point this solution is in 
                 }
             }
@@ -187,6 +187,7 @@ public class LLDominatedTree
     }
     
     void add(FETreeSolutionWrapper trackedPoint) {
+        System.out.println("In DTree add");
         if (size==0) {
             FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,true);
             this.numberOfActiveElements[0] = 1;

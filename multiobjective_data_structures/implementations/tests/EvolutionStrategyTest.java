@@ -76,12 +76,23 @@ public class EvolutionStrategyTest
     private static void checkEqualStates(ParetoSetManager list, ParetoSetManager linearList){
         Collection<? extends Solution> set1 = list.getContents();
         Collection<? extends Solution> set2 = linearList.getContents();
+        
+        /*System.out.println("Archive contents:");
         for (Solution s : set1){
             for (int j=0; j<s.getNumberOfObjectives(); j++){
                 System.out.print(s.getFitness(j) + ", ");
             }
             System.out.println();
         }
+        
+        System.out.println("Linear list contents:");
+        for (Solution s : set2){
+            for (int j=0; j<s.getNumberOfObjectives(); j++){
+                System.out.print(s.getFitness(j) + ", ");
+            }
+            System.out.println();
+        }*/
+        
         assertTrue("list size is: "+ list.size() +", linear list size is: "+ linearList.size(), list.size()==linearList.size());
         assertTrue("list (set) size is: "+ set1.size() +", linear list (set) size is: "+ set2.size(), set1.size()==set2.size());
         assertTrue(set2.containsAll(set1));

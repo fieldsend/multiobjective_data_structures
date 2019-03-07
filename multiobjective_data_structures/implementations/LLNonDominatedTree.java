@@ -36,7 +36,7 @@ public class LLNonDominatedTree
         }
         return i;
     }
-    
+
     FETreeCompositePoint getBest() {
         return head;
     }
@@ -104,7 +104,7 @@ public class LLNonDominatedTree
         // keep track of total null entries to balance tree building later
         for (int i=0; i < numberOfObjectives; i++)
             this.numberOfActiveElements[i] = (listOfElements.get(i)).size();
-        
+
     }
 
     int[] getActiveElementsOnEachObjective() {
@@ -118,16 +118,16 @@ public class LLNonDominatedTree
                 m = numberOfActiveElements[i];
         return m;
     }
-    
+
     void add(FETreeSolutionWrapper trackedPoint) {
-        
+
         if (size==0) {
             //System.out.println("tree empty, new head and tail");
             FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,false);
             this.numberOfActiveElements[0] = 1;
             for (int i=1; i < numberOfObjectives; i++)
                 this.numberOfActiveElements[i] = 0;
-            
+
             head = cp;
             tail = cp;
             size++;
@@ -204,113 +204,117 @@ public class LLNonDominatedTree
         return true;
     }
 
+    private FETreeCompositePoint resolveNewHead(FETreeCompositePoint insertedNode, FETreeSolutionWrapper trackedPoint,int indexToInsert, int numberActive) {
+        //boolean inserted = false;
+        //if (insertedCriterion==-1)
+        //System.out.println("Insert in new head...............");
+        insertedNode.instantiateDeepNodeSolutions(); // lazy allocation of space  
+        //int trackedIndex = -1;
+        int numberBetterOn = 0;
+        int[] indicesBetterOn = new int[numberOfObjectives];
+        boolean[] oldHeadIsBetter = new boolean[numberOfObjectives];
+        int[] deepLinkTransferedLocations = new int[numberOfObjectives];
+        int[] indexOfResponsibleElement = new int[numberOfObjectives];
+        // first identify which indices need to be moved down from head, and 
+        // which are deep copies that need resolving
+        for (int i=0; i<numberOfObjectives; i++) {
+            if (head.getFitness(i) < trackedPoint.getFitness(i)){
+                oldHeadIsBetter[i] = true;
+                if (head.activeElement(i)){
+                    indexOfResponsibleElement[i] = i;
+                } else {
+                    indexOfResponsibleElement[i] = head.getDeepIndex(i);
+                    // track in numberOfActiveElements that things are shifting
+                }
+            } else {
+                oldHeadIsBetter[i] = false;
+            }
+        }
+        // now reconfigure insertedNode (the new head) and Head (the old head)
+        for (int i=0; i<numberOfObjectives; i++) {
+            if (oldHeadIsBetter[i]){
+                //System.out.println("\nINFERRING/MOVING : " + i);
+                if (indexOfResponsibleElement[i]==i) {
+                    // shift to new head at element i
+                    insertedNode.setElement(i, head.getElement(i));
+                    // get old head to reference down to new head on indexOfInferred, so element
+                    // now only exisits in new head
+                    head.inferElementFromPrevious(i);
+                } else { // deep link to be handled
+                    if (oldHeadIsBetter[ indexOfResponsibleElement[i] ]) { // deep link is also being transferred down at other index
+                        // so link across
+                        // shift to new head at element i
+                        insertedNode.setDeepNodeSolution(i, indexOfResponsibleElement[i] );
+                        // get old head to reference down to new head on indexOfInferred, so element
+                        // now only exisits in new head
+                        head.inferElementFromPrevious(i);
+                    } else { // deep link not being transferred down as worse on objective it is being actively stored for in head
+                        //System.out.println("SWITCHING DEEP LINK..............." + i + " " + indexOfResponsibleElement[i]);
+
+                        // so need to do some rearranging...
+                        if (head.activeElement(indexOfResponsibleElement[i])) { // not yet shifted
+                            insertedNode.setElement(i, head.getElement( indexOfResponsibleElement[i] ));
+                            head.inferElementFromPrevious( indexOfResponsibleElement[i] );
+                            head.inferElementFromPrevious(i);
+                            deepLinkTransferedLocations[ indexOfResponsibleElement[i] ] = i; // keep track of where it has moved
+                            this.numberOfActiveElements[i]++;
+                            this.numberOfActiveElements[ indexOfResponsibleElement[i] ]--;
+                        } else { // the old guide in head has already shifted to a different index in the new head
+                            insertedNode.setDeepNodeSolution(i, deepLinkTransferedLocations[ indexOfResponsibleElement[i] ] );
+                            head.inferElementFromPrevious(i);
+                        }
+                    }
+                }
+            } else { // track which criteria need replacing by new point as worse in old head
+                //System.out.println("REPLACING : " + i + " na " + numberActive);
+                if (this.numberOfActiveElements[i] < numberActive) {
+                    indexToInsert = i;
+                    numberActive = numberOfActiveElements[i];
+                }
+                indicesBetterOn[numberBetterOn] = i;
+                numberBetterOn++;
+            }
+        }
+
+        // choose which critria to insert into --  all other criteria to be replaced deep reference this one
+        insertedNode.setElement(indexToInsert, trackedPoint);
+        this.numberOfActiveElements[indexToInsert]++;
+        for (int i=0; i<numberBetterOn; i++)
+            if (indexToInsert != indicesBetterOn[i])
+                insertedNode.setDeepNodeSolution(indicesBetterOn[i], indexToInsert);
+
+        insertedNode.setNext(head);
+        insertedNode.setPrevious(null);
+        head.setPrevious(insertedNode);
+        head.cleanDeepLinks();
+        FETreeCompositePoint node = head;
+        head = insertedNode;
+        if (node.getNumberOfStoredSolutions()==0) { // no contents unqiue to this node
+            return removeDuplicate(node);
+        }
+        return node;
+    }
+
     private void insertNewPointInBody(FETreeSolutionWrapper trackedPoint, FETreeCompositePoint higherNode) {
         FETreeCompositePoint insertedNode = new FETreeCompositePoint(numberOfObjectives);
         int indexToInsert = -1;
         int numberActive = Integer.MAX_VALUE;
-            
-        if(higherNode == head) {
-            //boolean inserted = false;
-            //if (insertedCriterion==-1)
-            //System.out.println("Insert in new head...............");
-            insertedNode.instantiateDeepNodeSolutions(); // lazy allocation of space  
-            //int trackedIndex = -1;
-            int numberBetterOn = 0;
-            int[] indicesBetterOn = new int[numberOfObjectives];
-            boolean[] oldHeadIsBetter = new boolean[numberOfObjectives];
-            int[] deepLinkTransferedLocations = new int[numberOfObjectives];
-            int[] indexOfResponsibleElement = new int[numberOfObjectives];
-                    // first identify which indices need to be moved down from head, and 
-                    // which are deep copies that need resolving
-            for (int i=0; i<numberOfObjectives; i++) {
-                if (head.getFitness(i) < trackedPoint.getFitness(i)){
-                    oldHeadIsBetter[i] = true;
-                    if (head.activeElement(i)){
-                        indexOfResponsibleElement[i] = i;
-                    } else {
-                        indexOfResponsibleElement[i] = head.getDeepIndex(i);
-                        // track in numberOfActiveElements that things are shifting
-                    }
-                } else {
-                    oldHeadIsBetter[i] = false;
-                }
-            }
-            // now reconfigure insertedNode (the new head) and Head (the old head)
-            for (int i=0; i<numberOfObjectives; i++) {
-                if (oldHeadIsBetter[i]){
-                    //System.out.println("\nINFERRING/MOVING : " + i);
-                    if (indexOfResponsibleElement[i]==i) {
-                        // shift to new head at element i
-                        insertedNode.setElement(i, head.getElement(i));
-                        // get old head to reference down to new head on indexOfInferred, so element
-                        // now only exisits in new head
-                        head.inferElementFromPrevious(i);
-                    } else { // deep link to be handled
-                        if (oldHeadIsBetter[ indexOfResponsibleElement[i] ]) { // deep link is also being transferred down at other index
-                            // so link across
-                            // shift to new head at element i
-                            insertedNode.setDeepNodeSolution(i, indexOfResponsibleElement[i] );
-                            // get old head to reference down to new head on indexOfInferred, so element
-                            // now only exisits in new head
-                            head.inferElementFromPrevious(i);
-                        } else { // deep link not being transferred down as worse on objective it is being actively stored for in head
-                            //System.out.println("SWITCHING DEEP LINK..............." + i + " " + indexOfResponsibleElement[i]);
-                    
-                            // so need to do some rearranging...
-                            if (head.activeElement(indexOfResponsibleElement[i])) { // not yet shifted
-                                insertedNode.setElement(i, head.getElement( indexOfResponsibleElement[i] ));
-                                head.inferElementFromPrevious( indexOfResponsibleElement[i] );
-                                head.inferElementFromPrevious(i);
-                                deepLinkTransferedLocations[ indexOfResponsibleElement[i] ] = i; // keep track of where it has moved
-                                this.numberOfActiveElements[i]++;
-                                this.numberOfActiveElements[ indexOfResponsibleElement[i] ]--;
-                            } else { // the old guide in head has already shifted to a different index in the new head
-                                insertedNode.setDeepNodeSolution(i, deepLinkTransferedLocations[ indexOfResponsibleElement[i] ] );
-                                head.inferElementFromPrevious(i);
-                            }
-                        }
-                    }
-                } else { // track which criteria need replacing by new point as worse in old head
-                    //System.out.println("REPLACING : " + i + " na " + numberActive);
-                    if (this.numberOfActiveElements[i] < numberActive) {
-                        indexToInsert = i;
-                        numberActive = numberOfActiveElements[i];
-                    }
-                    indicesBetterOn[numberBetterOn] = i;
-                    numberBetterOn++;
-                }
-            }
 
-            // choose which critria to insert into --  all other criteria to be replaced deep reference this one
-            insertedNode.setElement(indexToInsert, trackedPoint);
-            this.numberOfActiveElements[indexToInsert]++;
-            for (int i=0; i<numberBetterOn; i++)
-                if (indexToInsert != indicesBetterOn[i])
-                    insertedNode.setDeepNodeSolution(indicesBetterOn[i], indexToInsert);
-            
-            
-            insertedNode.setNext(head);
-            insertedNode.setPrevious(null);
-            head.setPrevious(insertedNode);
-            head.cleanDeepLinks();
-            FETreeCompositePoint node = head;
-            head = insertedNode;
-            if (node.getNumberOfStoredSolutions()==0) { // no contents unqiue to this node
-                removeDuplicate(node);
-            }
+        if(higherNode == head) {
+            resolveNewHead(insertedNode,trackedPoint,indexToInsert,numberActive);
         } else {
             //System.out.println("In insertNewPointInBody, body");
             for (int i=0; i<numberOfObjectives; i++){
                 if (higherNode.getFitness(i) < trackedPoint.getFitness(i)) {
                     //System.out.println("\nINFERRING/MOVING : " + i);
-                    
+
                     if (higherNode.getElement(i)!=null) {// not going to infer from lower node, but move solution down from higher
                         insertedNode.setElement(i, higherNode.getElement(i));
                         higherNode.inferElementFromPrevious(i);
                     } // if not infering from lower, don't need to do anything...
                 } else {
                     //System.out.println("\nREPLACING : " + i + " na " + numberActive);
-                    
+
                     if (this.numberOfActiveElements[i] < numberActive) {
                         indexToInsert = i;
                         numberActive = numberOfActiveElements[i];
@@ -320,7 +324,7 @@ public class LLNonDominatedTree
             // choose which critria to insert into --  all other criteria can be null and inferred from previous node
             insertedNode.setElement(indexToInsert, trackedPoint);
             this.numberOfActiveElements[indexToInsert]++;
-                
+
             insertedNode.setNext(higherNode);
             insertedNode.setPrevious(higherNode.getPrevious());
             higherNode.setPrevious(insertedNode);
@@ -342,11 +346,13 @@ public class LLNonDominatedTree
     boolean getDominatedByInsertAndClean(FETreeSolutionWrapper trackedPoint, HashSet<FETreeSolutionWrapper> dominatedSet) {
         //if (sanityCheck()==false)
         //    throw new RuntimeException("Sanity Check fail at start of insert and clean, tail disconnected");
-
+        //System.out.println("size: " + size);
         if (size==0)
             return false;
         // first clean all composite points which are strictly dominated
         while (trackedPoint.strictlyDominates(tail)) {
+            //System.out.println("NDTree tail strictly dominated by tracked point, cleaning out and going to next");
+            
             for (int i=0; i<numberOfObjectives; i++) {
                 if (tail.getElement(i)!=null) {
                     dominatedSet.add(tail.getElement(i));
@@ -365,6 +371,7 @@ public class LLNonDominatedTree
         FETreeCompositePoint node = head;
         // COULD BINARY SEARCH HERE
         while (node.strictlyDominates(trackedPoint))  {
+            //System.out.println("NDTree stricted dominates tracked point, going to next");
             if (node.getNext()!=null)
                 node = node.getNext();
             else
@@ -372,7 +379,16 @@ public class LLNonDominatedTree
         }
         int insertedCriterion=-1;
         // node does not strictly dominate
-        do {
+        if (node==head){
+            //System.out.println("UPDATING HEAD OF NDTree");
+            // special case where the head does not strictly dominate the new solution
+            // so need to take care, make a new head and pull down solutions if necessary
+            FETreeCompositePoint insertedNode = new FETreeCompositePoint(numberOfObjectives);
+            node = resolveNewHead(insertedNode,trackedPoint,-1,Integer.MAX_VALUE);
+            inserted = true;
+            size++;
+        }
+        while (node!=null) { // node could potentially be null if head replaced in previous block
             //System.out.println("In check loop:");
             for (int i=0; i<numberOfObjectives; i++) {
                 if (node.getElement(i)!=null) { // if null, already checked in a lower node, so no need to pull
@@ -402,7 +418,7 @@ public class LLNonDominatedTree
             } else {
                 node = node.getNext();
             }
-        } while (node!=null);
+        }
 
         //if (sanityCheck()==false)
         //    throw new RuntimeException("Sanity Check fail at end of insert and clean, tail disconnected " + size);
@@ -435,7 +451,7 @@ public class LLNonDominatedTree
         }
         return text;
     }
-    
+
     public String toCompleteString() {
         String text = "";
         FETreeCompositePoint node = head;

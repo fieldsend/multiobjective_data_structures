@@ -162,9 +162,6 @@ public class LLDominatedTree
             tail.setNext(null);
         }
     }
-
-    
-    
     
     int getMaxActiveElements() {
         int m = numberOfActiveElements[0];
@@ -187,8 +184,9 @@ public class LLDominatedTree
     }
     
     void add(FETreeSolutionWrapper trackedPoint) {
-        System.out.println("In DTree add");
+        //System.out.println("In DTree add");
         if (size==0) {
+            System.out.println("In DTree add, size =0");
             FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,true);
             this.numberOfActiveElements[0] = 1;
             for (int i=1; i < numberOfObjectives; i++)
@@ -196,7 +194,9 @@ public class LLDominatedTree
             head = cp;
             tail = cp;
         } else {
+            System.out.println("In DTree add, size !=0");
             if (trackedPoint.weaklyDominates(head)) {
+                System.out.println("tp weak doms head");
                 int index = getMaxNullElement();
                 FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,index,true);
                 this.numberOfActiveElements[index]++;
@@ -204,6 +204,7 @@ public class LLDominatedTree
                 cp.setNext(head);
                 head = cp;
             } else {
+                System.out.println("tp not weak doms head");
                 //get worst non-(weak)dominated by trackedPoint. If null, has at least one value worse than any previously seen
                 FETreeCompositePoint lowerNode = getWorstNotWeaklyDominated(trackedPoint);
                 if (lowerNode==null)
@@ -274,6 +275,8 @@ public class LLDominatedTree
         //System.out.println("TO REMOVE: " +  toRemove.getWrappedSolution());
         //System.out.println("CURRENT DTREE STATE: length" +  this.size() + ",  " + this);
         //System.out.println("SANITY CHECK PASS? " + sanityCheck());
+        //if (!dominator.weaklyDominates(toRemove.getWrappedSolution()))
+        //    System.out.println("ERROR -- dominating solution does not dominate wrapped solution!!");
         if (c.cleanAndReplaceDominatedTree(this,toRemove,dominator)) {
             v++;
         }

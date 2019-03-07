@@ -184,11 +184,11 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         } 
         // AT HEAD
         
-        // System.out.println("REMOVING FROM HEAD AND INSERTING");
+        //System.out.println("REMOVING FROM HEAD AND INSERTING");
         // this composite point is the head of the list
-        //System.out.println("CP HEAD "+ this);
+        // System.out.println("CP HEAD "+ this);
         
-        // need to process any deep links here as the removed pint may be responsible
+        // need to process any deep links here as the removed point may be responsible
         
         
         int numberOfElements = 1;

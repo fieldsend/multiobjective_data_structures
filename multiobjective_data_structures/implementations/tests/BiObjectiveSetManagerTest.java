@@ -1,6 +1,8 @@
-package multiobjective_data_structures.implementations;
+package multiobjective_data_structures.implementations.tests;
 import multiobjective_data_structures.*;
+import multiobjective_data_structures.implementations.BiObjectiveSetManager;
 
+//import multiobjective_data_structures.implementations.tests.SharedTest;
 
 import static org.junit.Assert.*;
 import org.junit.After;

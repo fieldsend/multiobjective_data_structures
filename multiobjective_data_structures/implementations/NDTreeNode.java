@@ -40,6 +40,11 @@ public class NDTreeNode
         this.parent = parent;
     }
     
+    
+    List<NDTreeNode> getChildren() {
+        return children;
+    }
+    
     void add(Solution solution){
         list.add(solution);
         if (list.size()==1)
@@ -205,7 +210,11 @@ public class NDTreeNode
                     this.idealPointEstimate = child.idealPointEstimate;
                     this.nadirPointEstimate = child.nadirPointEstimate;
                     this.midpoint = child.midpoint;
-                    children = null;
+                    this.children = child.children;
+                } else if (children.size()==0) {
+                    // special case if all child nodes cleared out
+                    children = null; // make a leaf
+                    list = new ArrayList<Solution>(MAX_LIST_SIZE+1);
                 }
             }
         }
@@ -354,4 +363,5 @@ public class NDTreeNode
             for (Solution s : list)
                 a.add(s);
     }
+    
 }

@@ -1,4 +1,7 @@
-package multiobjective_data_structures;
+package multiobjective_data_structures.implementations;
+
+import multiobjective_data_structures.ComparableSolutionDecorator;
+import multiobjective_data_structures.Solution;
 
 
 /**

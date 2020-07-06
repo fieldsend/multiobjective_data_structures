@@ -20,14 +20,14 @@ import java.util.Random;
  */
 public class EvolutionStrategyTest
 {
-    private DTLZSolution prevChild;
+    /*private DTLZSolution prevChild;
     private ParetoSetManager linearList;
     private Random rng;
     private ParetoSetManager list; 
     private int numberOfObjectives; 
     private int numberOfDesignVariables; 
     private int problem; 
-    private int iterations;
+    private int iterations;*/
     
     /*public EvolutionStrategyTest(ParetoSetManager list, Random rng, int numberOfObjectives, int numberOfDesignVariables, int problem, int iterations) {
         this.list = list;
@@ -39,12 +39,17 @@ public class EvolutionStrategyTest
     }*/
     
     
-    public static void exampleRunDTLZ(ParetoSetManager list, Random rng, int numberOfObjectives, int numberOfDesignVariables, int problem, int iterations) throws IllegalNumberOfObjectivesException {
-        ParetoSetManager linearList = LinearListManager.managerFactory(0L,numberOfObjectives);
+    public static DTLZSolution generateInitialSolution(int numberOfObjectives, int numberOfDesignVariables, Random rng, int problem) {
         DTLZSolution s = new DTLZSolution(numberOfObjectives, numberOfDesignVariables, rng);
         s.evaluate(problem);
         for (int j=0; j<numberOfObjectives; j++)
             System.out.print(s.getFitness(j) + ", ");
+        return s;
+    }
+    
+    public static void exampleRunDTLZ(ParetoSetManager list, Random rng, int numberOfObjectives, int numberOfDesignVariables, int problem, int iterations) throws IllegalNumberOfObjectivesException {
+        ParetoSetManager linearList = LinearListManager.managerFactory(0L,numberOfObjectives, true);
+        DTLZSolution s = generateInitialSolution(numberOfObjectives, numberOfDesignVariables, rng, problem);
         System.out.println();    
         list.add(s);
         linearList.add(s);
@@ -101,7 +106,7 @@ public class EvolutionStrategyTest
     
     
     
-    private static DTLZSolution evolve(DTLZSolution s,Random rng) {
+    public static DTLZSolution evolve(DTLZSolution s,Random rng) {
         // select dimension at random
         DTLZSolution child = new DTLZSolution(s,rng);
         int dimension = rng.nextInt(child.designVariables.length);

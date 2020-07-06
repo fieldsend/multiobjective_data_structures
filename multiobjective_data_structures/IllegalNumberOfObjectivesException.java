@@ -1,10 +1,11 @@
 package multiobjective_data_structures;
 
 /**
- * Write a description of class IllegalNumberOfObjectives here.
+ * IllegalNumberOfObjectives class -- to be thrown when using an incompatible
+ * number of objectives on an archive or solution instance
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public class IllegalNumberOfObjectivesException extends Exception
 {

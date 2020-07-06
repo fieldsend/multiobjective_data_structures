@@ -16,3 +16,10 @@ doc/package-list
 *.bluej
 
 package.bluej
+*.pdf
+*.dot
+*.csv
+multiobjective_data_structures/implementations/FETreeCompositePoint.java
+multiobjective_data_structures/implementations/FETreeCompositePoint.java
+multiobjective_data_structures/implementations/FETreeManager.java
+multiobjective_data_structures/implementations/FETreeSolutionWrapper.java

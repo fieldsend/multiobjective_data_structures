@@ -5,9 +5,9 @@
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class MFrontSolution implements Solution
+public class MFrontSolution //implements Solution
 {
-    private Solution contents;
+    /*private Solution contents;
     private MFrontSolution[] next;
     private MFrontSolution[] previous;
     
@@ -75,6 +75,6 @@ public class MFrontSolution implements Solution
     
     public int getNumberOfObjectives() {
         return contents.getNumberOfObjectives();
-    }
+	}*/
     
 }

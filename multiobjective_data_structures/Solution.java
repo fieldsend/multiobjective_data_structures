@@ -9,11 +9,31 @@ import java.util.ArrayList;
  */
 public interface Solution {
     //double[] getFitness(); 
+    
+    /**
+     * Gets the fitness (objective) value at the index element of this Solution
+     */
     double getFitness(int index);
+    
+    /**
+     * Sets the fitness (objective) value at the index element of this Solution
+     */
     void setFitness(int index, double value);
+    
+    /**
+     * Gets the fitness (objective) vector of this Solution
+     */
     void setFitness(double[] fitnesses);
+    
+    /** 
+     * Gets the number of objectives
+     */
     int getNumberOfObjectives(); 
     
+    /**
+     * Returns true if this Solution dominates the argument s (has a lower or equal value on all objectives)
+     * and strictly lower on at least one. Otherwise returns false
+     */
     default boolean dominates(Solution s){
         int better = 0;
         for (int i = 0; i < getNumberOfObjectives(); i++){
@@ -27,6 +47,11 @@ public interface Solution {
         return false;     
     }
     
+    /**
+     * Returns the relative order of this Solution compared to the argument s. If returns -1 then 
+     * this dominates or is equal to s in quality. If the method returns 1 this is dominated by s. 
+     * If it returns 0 this Solution and s are mutually non-dominating. 
+     */
     default int getParetoOrder(Solution s){
         boolean anyBetter=false;
         boolean anyWorse=false;
@@ -59,7 +84,10 @@ public interface Solution {
         return -1; // all same, so weakly dominates
     }
     
-    
+    /**
+     * Returns a boolean array, whose elements are true if this Solution is better (has a lower value) than the
+     * corresponding objective element as s, otherwise the element in the boolean array is false.
+     */
     default boolean[] better(Solution s){
         boolean[] array = new boolean[getNumberOfObjectives()];
         for (int i = 0; i < getNumberOfObjectives(); i++) {
@@ -71,6 +99,9 @@ public interface Solution {
         return array;     
     }
     
+    /**
+     * Returns true if this solution dominates or is equal quality to s, otherwise returns false
+     */
     default boolean weaklyDominates(Solution s){
         for (int i = 0; i < getNumberOfObjectives(); i++)
             if (getFitness(i) > s.getFitness(i))
@@ -79,6 +110,9 @@ public interface Solution {
         return true; // not worse on any objective, so must weakly dominate
     }
     
+    /**
+     * Returns true if the objective vector represented by d dominates or is equal quality to s, otherwise returns false
+     */
     static boolean weaklyDominates(double[] d, Solution s){
         for (int i = 0; i < s.getNumberOfObjectives(); i++)
             if (d[i] > s.getFitness(i))
@@ -87,6 +121,9 @@ public interface Solution {
         return true; // not worse on any objective, so must weakly dominate
     }
     
+    /**
+     * Returns true if s dominates or is equal quality to the objective vector represented by d, otherwise returns false
+     */
     static boolean weaklyDominates(Solution s, double[] d){
         for (int i = 0; i < s.getNumberOfObjectives(); i++)
             if (s.getFitness(i) > d[i])
@@ -99,7 +136,6 @@ public interface Solution {
      * Returns true if this Solution is better on all objectives than s. See e.g. Knowles et al.
      * A tutorial on the Performance Assessment of Stochastic Multiobjective Optimizers, 
      * ETH Zurich TIK-Report 214, 2006 for Strict Dominance definition.
-     * 
      */
     default boolean strictlyDominates(Solution s){
         for (int i = 0; i < getNumberOfObjectives(); i++)
@@ -109,6 +145,11 @@ public interface Solution {
         return true; // better on all objectives
     }
     
+    
+    /**
+     * Returns a boolean array, whose elements are true if this Solution is better (has a lower value) or equal value to the
+     * corresponding objective element in s, otherwise the element in the boolean array is false.
+     */
     default boolean[] betterOrEqual(Solution s){
         boolean[] array = new boolean[getNumberOfObjectives()];
         for (int i = 0; i < getNumberOfObjectives(); i++) {
@@ -120,6 +161,10 @@ public interface Solution {
         return array;     
     }
     
+    /** 
+     * Returns an ArrayList<Integer> holding the objective indices for which this Solution
+     * is better than s
+     */
     default ArrayList<Integer> betterObjectives(Solution s){
         ArrayList<Integer> array = new ArrayList<>(getNumberOfObjectives());
         int j=0;
@@ -129,6 +174,10 @@ public interface Solution {
         return array;     
     }
     
+    /** 
+     * Returns an ArrayList<Integer> holding the objective indices for which this Solution
+     * is equal to s
+     */
     default ArrayList<Integer> equalObjectives(Solution s){
         ArrayList<Integer> array = new ArrayList<>(getNumberOfObjectives());
         int j=0;
@@ -138,6 +187,10 @@ public interface Solution {
         return array;     
     }
     
+    /** 
+     * Returns an ArrayList<Integer> holding the objective indices for which this Solution
+     * is worse or equal than s
+     */
     default ArrayList<Integer> worseOrEqualObjectives(Solution s){
         ArrayList<Integer> array = new ArrayList<>(getNumberOfObjectives());
         int j=0;
@@ -148,7 +201,7 @@ public interface Solution {
     }
     
     /**
-     * calculates a weighted value depending on which objectives this Solution is greater 
+     * Calculates a weighted value depending on which objectives this Solution is greater 
      * or equal to argument s on
      */
     default int worseOrEqualIndex(Solution s, int elementWeights[]) {
@@ -161,7 +214,7 @@ public interface Solution {
     }
     
     /**
-     * calculates a weighted value depending on which objectives this Solution is greater 
+     * Calculates a weighted value depending on which objectives this Solution is greater 
      * or equal to argument s on
      */
     default int equalIndex(Solution s, int elementWeights[]) {
@@ -173,6 +226,9 @@ public interface Solution {
         return val; 
     }
     
+    /**
+     * Returns true if the objective vectors of this Solution and s hold the same values, otherwise returns false
+     */
     default boolean isFitnessTheSame(Solution s) {
         for (int i = 0; i < getNumberOfObjectives(); i++) 
             if (getFitness(i) != s.getFitness(i))

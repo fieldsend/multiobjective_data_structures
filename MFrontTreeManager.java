@@ -8,9 +8,9 @@ import java.util.HashSet;
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class MFrontTreeManager implements ParetoSetManager
+public class MFrontTreeManager// implements ParetoSetManager
 {
-    private int numberOfObjectives;
+    /* private int numberOfObjectives;
 
     MFrontTreeManager(int numberOfObjectives) {
         this.numberOfObjectives = numberOfObjectives;
@@ -100,6 +100,6 @@ public class MFrontTreeManager implements ParetoSetManager
             }
         }  
         return R;
-    }
+	}*/
 }
 

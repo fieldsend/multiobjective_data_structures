@@ -1,39 +1,41 @@
 package multiobjective_data_structures;
 
 /**
- * Abstract class ComparableSolutionDecorator - write a description of the class here
+ * Any abstract decorating class of the Solution interface
  * 
- * @author (your name here)
- * @version (version number or date here)
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public abstract class ComparableSolutionDecorator implements Solution, Comparable<Solution>
 {
     private Solution solution;
     
-    ComparableSolutionDecorator(Solution solution)
+    /**
+     * Solution to decorate
+     */
+    public ComparableSolutionDecorator(Solution solution)
     {
         this.solution = solution;
     }
-    /*@Override
-    public double[] getFitness()
-    {
-        return solution.getFitness();
-    }*/
+    
     @Override
     public double getFitness(int index)
     {
         return solution.getFitness(index);
     }
+    
     @Override
     public void setFitness(int index, double value)
     {
         solution.setFitness(index, value);
     }
+    
     @Override
     public void setFitness(double[] fitnesses)
     {
         solution.setFitness(fitnesses);
     }
+    
     @Override
     public int getNumberOfObjectives()
     {
@@ -48,6 +50,9 @@ public abstract class ComparableSolutionDecorator implements Solution, Comparabl
         return false;
     }
     
+    /**
+     * Return decorated solution
+     */
     public Solution getDecoratedSolution()
     {
         return solution;

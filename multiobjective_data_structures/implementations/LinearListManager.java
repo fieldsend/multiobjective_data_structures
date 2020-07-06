@@ -3,7 +3,12 @@ import multiobjective_data_structures.*;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Random;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Write a description of class LinearListManager here.
@@ -14,15 +19,20 @@ import java.util.Random;
 public class LinearListManager implements ParetoSetManager
 {
     private final int NUMBER_OF_OBJECTIVES;
-    private ArrayList<Solution> contents = new ArrayList<>();
+    private List<Solution> contents = new ArrayList<>();
     private Random randomNumberGenerator;
     
-    private LinearListManager(long seed, int numberOfObjectives)
+    private LinearListManager(long seed, int numberOfObjectives, boolean array)
     {
         randomNumberGenerator = new Random(seed);
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
+        if (array)
+            contents = new ArrayList<>();
+        else
+            contents = new LinkedList<>();
     }
     
+    @Override
     public boolean add(Solution s) throws IllegalNumberOfObjectivesException
     {
         // first check not weakly dominated
@@ -31,6 +41,7 @@ public class LinearListManager implements ParetoSetManager
         removeDominated(s);    
         return contents.add(s);
     }
+    
     
     private void removeDominated(Solution s) throws IllegalNumberOfObjectivesException
     {
@@ -42,6 +53,7 @@ public class LinearListManager implements ParetoSetManager
         }
     }
     
+    @Override
     public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException
     {
         for (Solution c : contents)
@@ -50,6 +62,7 @@ public class LinearListManager implements ParetoSetManager
         return false;        
     }
     
+    @Override
     public Collection<? extends Solution> getContents() 
     {
         return contents;
@@ -62,19 +75,42 @@ public class LinearListManager implements ParetoSetManager
         return contents.get(r);
     }
     
+    @Override
     public int size(){
         return contents.size();
     }
     
+    @Override
     public void clean()
     {
         contents.clear();
     }
     
-    public static ParetoSetManager managerFactory(long seed, int numberOfObjectives) throws IllegalNumberOfObjectivesException
+    public static ParetoSetManager managerFactory(long seed, int numberOfObjectives, boolean array) throws IllegalNumberOfObjectivesException
     {
         //if (numberOfObjectives != 2)
         //    throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");
-        return new LinearListManager(seed, numberOfObjectives);
+        return new LinearListManager(seed, numberOfObjectives, array);
+    }
+    
+    @Override
+    public void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException {
+        StringBuilder sb = new StringBuilder();
+
+        sb = new StringBuilder();
+        
+        sb.append("digraph D {\n");
+        // define nodes    
+        for (int i=0; i< contents.size(); i++) {
+            sb.append(i +" [shape=box fillcolor=yellow]\n");
+        }
+        // link nodes
+        for (int i=0; i< contents.size()-1; i++) {
+            sb.append(i + " -> " + (i+1) + "\n");
+        }
+        sb.append("}");
+        PrintWriter pw = new PrintWriter(new File(filename));
+        pw.write(sb.toString());
+        pw.close();
     }
 }

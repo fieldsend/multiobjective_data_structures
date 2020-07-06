@@ -11,7 +11,7 @@ public class ProxySolution implements Solution
 {
     private double[] objectives;
     
-    ProxySolution(double[] objectivesToCopy){
+    public ProxySolution(double[] objectivesToCopy){
         objectives = new double[ objectivesToCopy.length ];
         for (int i=0; i< objectivesToCopy.length; i++)
             objectives[i] = objectivesToCopy[i];

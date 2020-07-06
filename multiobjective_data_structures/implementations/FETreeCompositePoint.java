@@ -50,11 +50,11 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
         // for head of tree or for tail
         solutions[index] = s; 
         numberOfStoredSolutions = 1;
-        deepNodeSolutions = new int[s.getNumberOfObjectives()]; // track that index 0 feeds all criteria 
+        deepNodeSolutions = new int[s.getNumberOfObjectives()]; // track that index feeds all criteria 
         deepNodeSolutions[index]=-1;
         for (int i=0; i< solutions.length; i++) // set up links for deep node solutions
             if (i != index)
-                deepNodeSolutions[i] = 0;
+                deepNodeSolutions[i] = index;
         
         if (dominatedTreeNode) {
             s.setDominatedTreeCompositeMember(this);
@@ -82,6 +82,7 @@ public class FETreeCompositePoint implements Solution, Comparable<FETreeComposit
     void cleanDeepLinks() {
         deepNodeSolutions = null;
     }
+    
     int getDeepIndex(int index) {
         return deepNodeSolutions[index];
     }

@@ -1,6 +1,6 @@
 package multiobjective_data_structures.implementations;
 import multiobjective_data_structures.*;
-
+import multiobjective_data_structures.implementations.tests.ProxySolution;
 
 import java.util.Random;
 import java.util.TreeSet;
@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.io.FileNotFoundException;
 
 /**
  * BiObjectiveSetManager -- implementation of ParetoSetManager that is optimised for bi-objective problems
@@ -108,6 +109,11 @@ public class BiObjectiveSetManager implements ParetoSetManager
         contents = new TreeSet<>();
     }
     
+    @Override
+    public void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }  
+    
     //@Override
     public static ParetoSetManager managerFactory(long seed) throws IllegalNumberOfObjectivesException
     {
@@ -115,5 +121,7 @@ public class BiObjectiveSetManager implements ParetoSetManager
         //    throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");
         return new BiObjectiveSetManager(seed);
     }
+    
+    
     
 }

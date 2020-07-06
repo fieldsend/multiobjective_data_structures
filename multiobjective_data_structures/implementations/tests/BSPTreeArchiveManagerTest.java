@@ -1,7 +1,9 @@
-package multiobjective_data_structures.implementations;
+package multiobjective_data_structures.implementations.tests;
 import multiobjective_data_structures.*;
-import multiobjective_data_structures.implementations.tests.SharedTest;
-import multiobjective_data_structures.implementations.tests.EvolutionStrategyTest;
+import multiobjective_data_structures.implementations.BSPTreeArchiveManager;
+//import multiobjective_data_structures.implementations.tests.SharedTest;
+//import multiobjective_data_structures.implementations.tests.EvolutionStrategyTest;
+
 
 import static org.junit.Assert.*;
 import org.junit.After;
@@ -15,14 +17,14 @@ import java.util.Collection;
  * @author  (your name)
  * @version (a version number or a date)
  */
-public class MTQuadTree3Test
+public class BSPTreeArchiveManagerTest
 {
     private int numberOfQueries = 2000;
     
     /**
      * Default constructor for test class LinearListManagerTest
      */
-    public MTQuadTree3Test()
+    public BSPTreeArchiveManagerTest()
     {
     }
 
@@ -48,7 +50,7 @@ public class MTQuadTree3Test
     
     @Test
     public void testSize(){
-        ParetoSetManager list = MTQuadTree3.managerFactory(2);
+        ParetoSetManager list = BSPTreeArchiveManager.managerFactory(2);
         assertTrue(list.size()==0);
     }
     
@@ -57,35 +59,35 @@ public class MTQuadTree3Test
     public void testAdd2()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 2;
-        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd3()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 3;
-        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd10()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 10;
-        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test(timeout=200000)
     public void testAdd100()
     throws IllegalNumberOfObjectivesException {
         int objectiveNumber = 100;
-        SharedTest.exampleRun(MTQuadTree3.managerFactory(objectiveNumber),new Random(0L),objectiveNumber,numberOfQueries);      
+        SharedTest.exampleRun(BSPTreeArchiveManager.managerFactory(objectiveNumber,20),new Random(0L),objectiveNumber,numberOfQueries);      
     }
     
     @Test
     public void testES()
     throws IllegalNumberOfObjectivesException {
-        int objectiveNumber = 5;
-        EvolutionStrategyTest.exampleRunDTLZ(MTQuadTree3.managerFactory(objectiveNumber), 
+        int objectiveNumber = 10;
+        EvolutionStrategyTest.exampleRunDTLZ(BSPTreeArchiveManager.managerFactory(objectiveNumber,20), 
             new Random(0L),objectiveNumber,objectiveNumber-1+9, 2, 10000);  
     }
 }

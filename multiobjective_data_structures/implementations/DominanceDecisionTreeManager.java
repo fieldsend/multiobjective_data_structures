@@ -3,12 +3,20 @@ import multiobjective_data_structures.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
- * Write a description of class DominanceDecisionTreeManager here.
+ * DominanceDecisionTreeManager class implements the Dominance decision tree of
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * Oliver Schütze. 2003. 
+ * A New Data Structure for the Nondominance Problem in Multi-objective Optimization. 
+ * In International Conference on Evolutionary Multi-Criterion Optimization, EMO 2003 
+ * (LNCS), Vol. 2632. Springer, 509–518
+ * 
+ * @author Jonathan Fieldsend
+ * @version 29/04/2019
  */
 public class DominanceDecisionTreeManager implements ParetoSetManager
 {
@@ -191,4 +199,48 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
                 s += "C" +i + " "+ recursivelyGetParentAndChildDetails(children[i]);
         return s + "\n";
     }
+    
+   
+    @Override
+    public void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException {
+        StringBuilder sb = new StringBuilder();
+
+        StringBuilder nodes = new StringBuilder();
+        StringBuilder graph = new StringBuilder();
+        
+        sb.append("digraph D {\n");
+        
+        int index = 0;
+        // link nodes
+        if (root != null) {
+            graphVizLinkToChildren(0, 1, root,graph);
+        }
+        
+        // define nodes    
+        for (int i=0; i<size(); i++){
+            nodes.append(i +" [shape=box fillcolor=yellow]\n");
+        }
+        
+        sb.append(nodes);
+        sb.append(graph);
+        sb.append("}");
+        PrintWriter pw = new PrintWriter(new File(filename));
+        pw.write(sb.toString());
+        pw.close();
+    }  
+    
+    private int graphVizLinkToChildren(int parentIndex, int currentIndex, DDTNode current, StringBuilder sb) {
+        
+        if (!current.isLeaf()) {
+            DDTNode[] children = current.getChildren();
+            for (DDTNode child : children) {
+                if (child != null) {
+                    sb.append(parentIndex + " -> " + currentIndex + "\n");
+                    currentIndex = graphVizLinkToChildren(currentIndex, currentIndex+1, child,sb);
+                }
+            }
+        }
+        return currentIndex;
+    }
+    
 }

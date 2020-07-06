@@ -1,11 +1,13 @@
 package multiobjective_data_structures.implementations;
 import multiobjective_data_structures.*;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.Iterator;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * NEED TO IMPLEMENT REBALANCING
@@ -24,7 +26,7 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
     }
-    
+
     private BSPTreeArchiveManager(int numberOfObjectives, int maxLeafSize) {
         root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
         this.maxLeafSize = maxLeafSize;
@@ -37,25 +39,36 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         if (s.getNumberOfObjectives() != NUMBER_OF_OBJECTIVES)
             throw new IllegalNumberOfObjectivesException("Archive maintains solutions with " 
                 + NUMBER_OF_OBJECTIVES + " number of objectives, not " + s.getNumberOfObjectives());
+
+        //System.out.println(".");        
         if (checkDominance(root,s,new TreeSet<Integer>(),new TreeSet<Integer>()) < 0 )
             return false;
+
         BSPTreeNode node =  root;
-        while (node.isInteriorNode()) {
-            node.incrementNumberCovered();
-            if (node.isImbalanced(rebalanceFactor)) // check if node has reached a state needing rebalancing
+        whileLoop: while (node.isInteriorNode()) {
+            if (node.isImbalanced(rebalanceFactor)) { // check if node has reached a state needing rebalancing
                 node.rebalance(maxLeafSize); // rebalance before processing further
-            
+                //node.printTreeBalance();
+                if (!node.isInteriorNode())
+                    break whileLoop; // rebalancing has now made node a leaf, so need to break out
+                //node.incrementNumberCovered();
+            }
+            node.incrementNumberCovered();
             node = node.getChild(s);
         }
         node.addToSet(s,maxLeafSize);
+        /*if (root.countInconsistentCoverage() > 0) {
+        System.out.println("\n >>INCONSITENCY after total tree rebalance");
+        root.printTreeBalance();
+        throw new RuntimeException("inconsistencey");
+        }*/
         return true;
     }
 
     private int processLeafForDominanceCheck(BSPTreeNode node, Solution s)
     {
         int k=0;
-        ArrayList<Solution> setCovered = node.getCoveredSet();
-        Iterator<Solution> iterator = setCovered.iterator();
+        Iterator<Solution> iterator = node.getCoveredSet().iterator();
         while (iterator.hasNext()) {
             Solution member  = iterator.next();
             //System.out.println("Comparing " + member +" to "+ s);
@@ -73,13 +86,11 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return k;
     }
 
-    
     private int checkDominance(BSPTreeNode node, Solution s,  TreeSet<Integer> b, TreeSet<Integer> w) {
         int k = 0;
         if (!node.isInteriorNode()) {
             k = processLeafForDominanceCheck(node,s);
-        }
-        if (node.isInteriorNode()) {
+        } else { // continue down tree to a leaf
             TreeSet<Integer> wPrime;
             TreeSet<Integer> bPrime; 
             // update B to B' or W to W'
@@ -92,9 +103,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
                 wPrime.add(node.getObjectiveIndex());
                 bPrime = b;
             }
-            if (w.size() == NUMBER_OF_OBJECTIVES)   
+            if (wPrime.size() == NUMBER_OF_OBJECTIVES)   
                 return -1;
-            else if (b.size() == NUMBER_OF_OBJECTIVES) {
+            else if (bPrime.size() == NUMBER_OF_OBJECTIVES) {
                 k += node.getRight().getNumberCovered();
                 node.getRight().removeAllCovered();
             } else {
@@ -119,19 +130,14 @@ public class BSPTreeArchiveManager implements ParetoSetManager
                 }
             }
             node.decrementNumberCovered(k);
+
+            //check if left has contents and right is empty, as can rerrange and detach
             if ((node.getLeft().getNumberCovered() > 0) && (node.getRight().getNumberCovered() == 0)) {
-                if  (node.getParent().getLeft()==node) // find if node is the left or right child of parent
-                    node.getParent().setLeft(node.getLeft()); // swap in left to replace node
-                else
-                    node.getParent().setRight(node.getLeft()); // swap in left to replace node
-                node.setParent(null); // detatch node
+                node.replaceWithLeftChild();
             }
-            if ((node.getRight().getNumberCovered() > 0) && (node.getLeft().getNumberCovered() == 0)) {
-                if  (node.getParent().getLeft()==node) // find if node is the left or right child of parent
-                    node.getParent().setLeft(node.getRight()); // swap in right to replace node
-                else
-                    node.getParent().setRight(node.getRight()); // swap in right to replace node
-                node.setParent(null); // detatch node
+            // check if right has contents and left is empty, as can rearrange and detach
+            else if ((node.getRight().getNumberCovered() > 0) && (node.getLeft().getNumberCovered() == 0)) {
+                node.replaceWithRightChild();
             }
         }
         return k;
@@ -186,11 +192,11 @@ public class BSPTreeArchiveManager implements ParetoSetManager
 
     @Override
     public Collection<? extends Solution> getContents() {
-         ArrayList<Solution> contents = new ArrayList<Solution>(this.size());
-         recursivelyFillWithContents(root, contents);
-         return contents;
+        ArrayList<Solution> contents = new ArrayList<Solution>(this.size());
+        recursivelyFillWithContents(root, contents);
+        return contents;
     }
-    
+
     private void recursivelyFillWithContents(BSPTreeNode node, ArrayList<Solution> contents) {
         if (node.isInteriorNode()) {
             recursivelyFillWithContents(node.getLeft(), contents);
@@ -200,7 +206,10 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         }
     }
 
-    
+    public int deepGetNumberCovered() {
+        return root.getDeepCovered();
+    }
+
     @Override
     public int size() {
         return root.getNumberCovered();
@@ -215,13 +224,13 @@ public class BSPTreeArchiveManager implements ParetoSetManager
     public String toString() {
         return rescursivelyAddToString(root," ");
     }
-    
+
     @Override
     public Solution getRandomMember() throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException();
     }
-    
+
     private String rescursivelyAddToString(BSPTreeNode node, String s) {
         if (node.isInteriorNode()) {
             s += " index " + node.getObjectiveIndex() + " < " + node.getTheta() + " " + rescursivelyAddToString(node.getLeft(), s);
@@ -234,7 +243,59 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         }
         return s;
     }
+
     
+    @Override
+    public void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException {
+        StringBuilder sb = new StringBuilder();
+
+        StringBuilder nodes = new StringBuilder();
+        StringBuilder graph = new StringBuilder();
+        
+        sb.append("digraph D {\n");
+        
+        int index = 0;
+        ArrayList<Integer> interiorIndices = new ArrayList<>();
+        ArrayList<Integer> leafIndices = new ArrayList<>();
+        interiorIndices.add(0); 
+        // link nodes
+        if (root != null) {
+            graphVizLinkToChildren(0, 1, root,graph,leafIndices,interiorIndices);
+        }
+        
+        // define nodes    
+        for (int i : leafIndices){
+            nodes.append(i +" [shape=box fillcolor=yellow]\n");
+        }
+        for (int i : interiorIndices){
+            nodes.append(i +" [shape=oval fillcolor=red]\n");
+        }
+        
+        sb.append(nodes);
+        sb.append(graph);
+        sb.append("}");
+        PrintWriter pw = new PrintWriter(new File(filename));
+        pw.write(sb.toString());
+        pw.close();
+    }  
+    
+    private int graphVizLinkToChildren(int parentIndex, int currentIndex, BSPTreeNode current, StringBuilder sb, ArrayList<Integer> leafIndices, ArrayList<Integer> interiorIndices) {
+        
+        if (current.isInteriorNode()) {
+            sb.append(parentIndex + " -> " + currentIndex + "\n");
+            interiorIndices.add(currentIndex); 
+            currentIndex = graphVizLinkToChildren(currentIndex, currentIndex+1, current.getLeft(),sb,leafIndices,interiorIndices);
+            sb.append(parentIndex + " -> " + currentIndex + "\n");
+            interiorIndices.add(currentIndex); 
+            currentIndex = graphVizLinkToChildren(currentIndex, currentIndex+1,current.getRight(),sb,leafIndices,interiorIndices);
+        } else {
+            for (int i = 0; i < current.getNumberCovered(); i++) {
+                leafIndices.add(currentIndex);
+                sb.append(parentIndex + " -> " + (currentIndex++) + "\n");
+            }
+        }
+        return currentIndex;
+    }
     
     public static ParetoSetManager managerFactory(int numberOfObjectives, int maxLeafSize) {
         return new BSPTreeArchiveManager(numberOfObjectives,maxLeafSize);

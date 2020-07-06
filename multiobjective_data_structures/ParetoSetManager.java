@@ -1,6 +1,7 @@
 package multiobjective_data_structures;
 
 import java.util.Collection;
+import java.io.FileNotFoundException;
 
 /**
  * ParetoSetManager. Describes methods that all managers of Pareto sets need to provide.
@@ -40,12 +41,22 @@ public interface ParetoSetManager
      */
     void clean();
     
+    /**
+     * Optional method to get a random member of the maintained archive. 
+     * Throws an UnsupportedOperationException instance if this operation is not supported
+     * by an implementation
+     */
     Solution getRandomMember() throws UnsupportedOperationException;
+  
     
     /**
-     * Method provides a new empty ParetoSetManager
+     * Optional method to write to a file a GraphViz '.dot' file representation of the current
+     * state of the data structure representing this archive. 
+     * Throws an UnsupportedOperationException instance if this operation is not supported
+     * by an implementation
      */
-    //ParetoSetManager managerFactory(int numberOfObjectives, long seed) throws IllegalNumberOfObjectives;
+    void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException;
+    
     
     /**
      * Replaces the contents of this set, with that mantained in the argument.

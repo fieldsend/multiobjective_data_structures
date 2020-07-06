@@ -10,12 +10,12 @@ import java.util.List;
  */
 public class SortedLinkedList
 {
-    private List<SolutionWrapper> list = new LinkedList<>();
+    /*private List<SolutionWrapper> list = new LinkedList<>();
     private static final int LINEAR_LIMIT = 5;
     
-    /**
-     * Constructor for objects of class SortedLinkedList
-     */
+    
+    // Constructor for objects of class SortedLinkedList
+     
     SortedLinkedList()
     {
         
@@ -40,10 +40,10 @@ public class SortedLinkedList
         return false;
     }
     
-    /*
-     * Returns index item should be inserted in, bracketed by a lower value below (or at bottom if none lower
-     * and higher or equal value above (or at list max index +1 if none larger) 
-     */
+    
+    // Returns index item should be inserted in, bracketed by a lower value below (or at bottom if none lower
+    // and higher or equal value above (or at list max index +1 if none larger) 
+     
     private int findInsertionPointIndex(SolutionWrapper item) {
         if (list.size() < LINEAR_LIMIT){ // if list small, just linear search 
             int index = 0;
@@ -71,9 +71,9 @@ public class SortedLinkedList
             return binarySearchInsert(midPoint+1, upperExclusiveLimit, item);
     }
     
-    /*
-     * Returns index of item in list, returns -1 if not in list
-     */
+    
+    // Returns index of item in list, returns -1 if not in list
+    
     private int findItemIndex(SolutionWrapper item){
         if (list.size() < LINEAR_LIMIT){ // if list small, just linear search 
             int index = 0;
@@ -101,5 +101,5 @@ public class SortedLinkedList
             return binarySearchInsert(lowerInclusiveLimit, midPoint, item);
         else
             return binarySearchInsert(midPoint+1, upperExclusiveLimit, item);
-    }
+    }*/
 }

@@ -9,19 +9,19 @@ import java.util.Random;
  * @author (your name) 
  * @version (a version number or a date)
  */
-class DTLZSolution implements Solution {
+public class DTLZSolution implements Solution {
     private double[] objectives;
     double designVariables[];
     Random rng;
     
-    DTLZSolution(double[] lowerBound, double[] upperBound, Random rng){
+    public DTLZSolution(double[] lowerBound, double[] upperBound, Random rng){
         this.rng = rng;
         objectives = new double[ lowerBound.length ];
         for (int i=0; i<lowerBound.length; i++)
             objectives[i] = lowerBound[i] + rng.nextDouble()*(upperBound[i] - lowerBound[i]);
     }
 
-    DTLZSolution(int numberOfObjectives, int numberOfDesignVariables, Random rng){
+    public DTLZSolution(int numberOfObjectives, int numberOfDesignVariables, Random rng){
         this.rng = rng;
         objectives = new double[ numberOfObjectives ];
         designVariables = new double[ numberOfDesignVariables ];
@@ -29,7 +29,7 @@ class DTLZSolution implements Solution {
             designVariables[i] = rng.nextDouble();
     }
 
-    DTLZSolution(DTLZSolution toCopy, Random rng) {
+    public DTLZSolution(DTLZSolution toCopy, Random rng) {
         this.rng = rng;
         objectives = new double[ toCopy.objectives.length ];
         designVariables = new double[ toCopy.designVariables.length ];
@@ -83,7 +83,7 @@ class DTLZSolution implements Solution {
         return s;    
     }
     
-    void evaluate(int problem) {
+    public void evaluate(int problem) {
         if (problem ==1)
             DTLZ1();
         else

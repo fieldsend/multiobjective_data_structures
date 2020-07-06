@@ -7,7 +7,7 @@
  */
 public class DominationTreeNode
 {
-    private DominationTreeNode[] children;
+    /*private DominationTreeNode[] children;
     private DominationTreeNode parent;
     private Solution solution;
     
@@ -23,5 +23,5 @@ public class DominationTreeNode
     
     DominationTreeNode[] getChildren() {
         return children;
-    }
+	}*/
 }

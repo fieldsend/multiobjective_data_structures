@@ -21,7 +21,7 @@ public class BSPTreeNode
     private double theta;
     private int numberCovered;
     private ArrayList<Solution> setCovered;
-
+    private boolean dead = false;
 
     BSPTreeNode(ArrayList<Solution> setCovered, int numberOfObjectives, BSPTreeNode parent) {
         this.setCovered = setCovered;
@@ -29,50 +29,49 @@ public class BSPTreeNode
         this.parent = parent;
         this.numberCovered = setCovered.size();
     }
-     
-    
+
     void setParent(BSPTreeNode parent) {
         this.parent = parent;
     }
-    
+
     void setRight(BSPTreeNode right) {
         this.right = right;
     }
-    
+
     BSPTreeNode getLeft() {
         return left;
     }
-    
+
     BSPTreeNode getRight() {
         return right;
     }
-    
+
     BSPTreeNode getParent() {
         return parent;
     }
-    
-    void setLeft(BSPTreeNode Left) {
+
+    void setLeft(BSPTreeNode left) {
         this.left = left;
     }
-    
+
     int getObjectiveIndex() {
         return objectiveIndex;
     }
-    
+
     double getTheta() {
         return theta;
     }
-    
+
     int getNumberCovered() {
         return numberCovered;
     }
-    
+
     ArrayList<Solution> getCoveredSet() {
         return setCovered;
     }
-    
+
     boolean isInteriorNode() {
-        return setCovered==null; // interior nodes do not contain any solutions
+        return setCovered == null; // interior nodes do not contain any solutions
     }
 
     void incrementNumberCovered() {
@@ -82,19 +81,28 @@ public class BSPTreeNode
     void decrementNumberCovered() {
         numberCovered--;
     }
-    
+
     void decrementNumberCovered(int k) {
-        numberCovered-=k;
+        numberCovered -= k;
     }
-    
+
     void removeAllCovered() {
         numberCovered=0;
     }
-    
+
     BSPTreeNode getChild(Solution s) {
         if (s.getFitness(objectiveIndex) < theta)
             return left;
         return right;
+    }
+
+    boolean isDead() {
+        return dead;
+    }
+
+    void setAsDead() {
+        numberCovered = 0;
+        dead = true;
     }
 
     boolean isImbalanced(double z) {
@@ -102,34 +110,49 @@ public class BSPTreeNode
             return true;
         return false;    
     }
-    
+
+    void replaceWithLeftChild() {
+        setCovered = left.setCovered;
+        theta = left.theta;
+        objectiveIndex = left.objectiveIndex;
+        numberCovered = left.numberCovered;
+        right = left.right;
+        left = left.left; 
+    }
+
+    void replaceWithRightChild() {
+        setCovered = right.setCovered;
+        theta = right.theta;
+        objectiveIndex = right.objectiveIndex;
+        numberCovered = right.numberCovered;
+        left = right.left;
+        right = right.right;
+    }
+
     // pull in contents from smaller child and re-distribute
     void rebalance(int maxLeafSize) {
         ArrayList<Solution> setToReinsert;
+        /*System.out.println("REBALANCING " + left.getNumberCovered()+" " +right.getNumberCovered() + " " +getNumberCovered());
+        if (this.countInconsistentCoverage() > 0)
+        System.out.println("\n >>INCONSITENCY before rebalance");
+         */
+
         if (left.getNumberCovered() > right.getNumberCovered()) {
-            //System.out.println("REBALANCING LEFT");
             // left subtree is larger, so set this covered as left covered, and reinsert right subtree
             setToReinsert = new ArrayList<>(right.getNumberCovered());
-            setCovered = left.setCovered;
             right.extractSubTreeContents(setToReinsert);
-            // disconnect left and right, and replace
-            right = left.right;
-            left = left.left;   
+            replaceWithLeftChild();
         } else {
-            //System.out.println("REBALANCING RIGHT");
             setToReinsert = new ArrayList<>(left.getNumberCovered());
-            setCovered = right.setCovered;
             left.extractSubTreeContents(setToReinsert);
-            // disconnect left and right, and replace
-            left = right.left;
-            right = right.right;   
+            replaceWithRightChild();
         }
-        //System.out.println("REBALANCING REINSERT number: " + setToReinsert.size());
-        decrementNumberCovered(setToReinsert.size()); // need to avoid double-counting those we are reinserting
+        // System.out.println("REBALANCING REINSERT number: " + setToReinsert.size());
         // now reinsert everything from this node down
         for (Solution s : setToReinsert) {
             // traverse down to leaf
             BSPTreeNode node = this;
+
             while (node.isInteriorNode()) {
                 node.incrementNumberCovered();
                 node = node.getChild(s);
@@ -138,7 +161,7 @@ public class BSPTreeNode
             node.addToSet(s,maxLeafSize);
         }
     }
-    
+
     private void extractSubTreeContents(ArrayList<Solution> setToReinsert) {
         if (this.isInteriorNode()) {
             left.extractSubTreeContents(setToReinsert);
@@ -147,7 +170,7 @@ public class BSPTreeNode
             setToReinsert.addAll(setCovered);
         }
     }
-    
+
     void addToSet(Solution s, int maxLeafSize) {
         setCovered.add(s);
         numberCovered++;
@@ -174,7 +197,7 @@ public class BSPTreeNode
             int tempDist= -1;
             ArrayList<Integer> validObjectives = new ArrayList<>(numberOfObjectives);
             //double[] v = setCovered.get(0).getFitness();
-                
+
             loop1 : for (int i=0; i < numberOfObjectives; i++){
                 for (int j=1; j<setCovered.size(); j++) {
                     if (setCovered.get(0).getFitness(i) != setCovered.get(j).getFitness(i)){
@@ -191,21 +214,21 @@ public class BSPTreeNode
                 }
             }
         } else { //special case when only one solution max in each leaf
-          int tempDist = -1;
-          for (int i=0; i < numberOfObjectives; i++) { // get closest distance to parent with each index 
+            int tempDist = -1;
+            for (int i=0; i < numberOfObjectives; i++) { // get closest distance to parent with each index 
                 int distance = trackBackClosestIndex(i,1);
                 if (distance > tempDist) {
                     tempDist = distance;
                     objectiveIndex = i;
                 }
-          } 
+            } 
         }
         // Set theta
         boolean moreThanOneValueInLeft = false;
         boolean moreThanOneValueInRight = false;
         PriorityQueue<Double> leftQueue = new PriorityQueue<>(maxLeafSize, Collections.reverseOrder()); // top of queue is maximimum element
         PriorityQueue<Double> rightQueue = new PriorityQueue<>(maxLeafSize); // top of queue is minimum element
-        
+
         // split data to find median, but ensure that there are two different values at the top of the left and bottom of the right
         // to ensure data is partitioned
         double leftQueueMin = Integer.MAX_VALUE;
@@ -252,4 +275,37 @@ public class BSPTreeNode
             return number;
         return parent.trackBackClosestIndex(j, number++);
     }
+
+    int getDeepCovered() {
+        if (!isInteriorNode())
+            return getNumberCovered();
+
+        int v = left.getDeepCovered();
+        v += right.getDeepCovered();
+        return v;
+    }
+
+    void printTreeBalance() {
+        if (!isInteriorNode()) {
+            System.out.println(this + "Leaf: " + setCovered.size() + " " + numberCovered);
+            return;
+        }
+        System.out.println(this + "Interior: " + left.getNumberCovered() + " " + 
+            right.getNumberCovered() + " sum "+ (left.getNumberCovered()+right.getNumberCovered()) + " trckd: " + numberCovered);
+
+        left.printTreeBalance();
+        right.printTreeBalance();
+        return;
+    }
+
+    int countInconsistentCoverage() {
+
+        if (!isInteriorNode())
+            return Math.abs(numberCovered - setCovered.size());
+        int v = Math.abs(numberCovered - left.getNumberCovered() - right.getNumberCovered() );
+        v += left.countInconsistentCoverage();
+        v += right.countInconsistentCoverage();
+        return v;
+    }
+    
 }

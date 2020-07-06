@@ -4,6 +4,9 @@ import multiobjective_data_structures.*;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
 
 /**
  * NDTree, implementation of ND tree by Jaszkiewicz and Lust.
@@ -36,7 +39,10 @@ public class NDTree implements ParetoSetManager
         } else {
             if (root.updateNode(s,null)) { // returns true if solution not covered by any member in tree
                 //System.out.println("Proposal not dominated by ND-Tree");
-                root.insert(s);
+                if (root.isEmpty())
+                    root.add(s); // Special case where s has dominated and cleared tree entirely
+                else
+                    root.insert(s);
                 return true;
             }
         }
@@ -86,6 +92,57 @@ public class NDTree implements ParetoSetManager
         throw new UnsupportedOperationException();
     }
     
+    
+    @Override
+    public void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException {
+        StringBuilder sb = new StringBuilder();
+
+        StringBuilder nodes = new StringBuilder();
+        StringBuilder graph = new StringBuilder();
+        
+        sb.append("digraph D {\n");
+        
+        int index = 0;
+        ArrayList<Integer> interiorIndices = new ArrayList<>();
+        ArrayList<Integer> leafIndices = new ArrayList<>();
+        interiorIndices.add(0); 
+        // link nodes
+        if (root != null) {
+            graphVizLinkToChildren(0, 1, root,graph,leafIndices,interiorIndices);
+        }
+        
+        // define nodes    
+        for (int i : leafIndices){
+            nodes.append(i +" [shape=box fillcolor=yellow]\n");
+        }
+        for (int i : interiorIndices){
+            nodes.append(i +" [shape=oval fillcolor=red]\n");
+        }
+        
+        sb.append(nodes);
+        sb.append(graph);
+        sb.append("}");
+        PrintWriter pw = new PrintWriter(new File(filename));
+        pw.write(sb.toString());
+        pw.close();
+    }  
+    
+    private int graphVizLinkToChildren(int parentIndex, int currentIndex, NDTreeNode current, StringBuilder sb, ArrayList<Integer> leafIndices, ArrayList<Integer> interiorIndices) {
+        
+        if (!current.isLeaf()) {
+            for (NDTreeNode child : current.getChildren()) {
+                sb.append(parentIndex + " -> " + currentIndex + "\n");
+                interiorIndices.add(currentIndex); 
+                currentIndex = graphVizLinkToChildren(currentIndex, currentIndex+1, child,sb,leafIndices,interiorIndices);
+            }
+        } else {
+            for (int i = 0; i < current.coverage(); i++) {
+                leafIndices.add(currentIndex);
+                sb.append(parentIndex + " -> " + (currentIndex++) + "\n");
+            }
+        }
+        return currentIndex;
+    }
     
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new NDTree(numberOfObjectives);

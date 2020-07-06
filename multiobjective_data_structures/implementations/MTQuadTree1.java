@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collection;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Write a description of class MTQuadTree1 here.
@@ -84,7 +87,7 @@ public class MTQuadTree1 implements ParetoSetManager
             n.setCargoAndCleanChildren(s); // one added and one removed, so no changed of numberOfElements necessary 
             for (MTQuadTreeNode child : childrenOfDominatedNode){ 
                 if (child!=null)
-                    recursivelyReInsert(s,child,n,true); // add child (at its children) from n as parent
+                    recursivelyReInsert(s,child,n,true); // add child (and its children) from n as parent
             }
             return true;
         }
@@ -149,7 +152,7 @@ public class MTQuadTree1 implements ParetoSetManager
             n.setChild(c,index);
             numberOfElements++;
             return;
-        } else { //replace root with k-child, then compare c to this as the new root
+        } else { 
             // last argument is false as at this point all c's orginal children have been stripped off
             // and checked, and the counter alreday updated with c's removal
             recursivelyReInsert(potentialDominator,c, n.getChild(index),false);
@@ -259,6 +262,44 @@ public class MTQuadTree1 implements ParetoSetManager
         numberOfElements = 0;
     }
 
+    @Override
+    public void writeGraphVizFile(String filename) throws FileNotFoundException, UnsupportedOperationException {
+        StringBuilder sb = new StringBuilder();
+
+        sb = new StringBuilder();
+        
+        sb.append("digraph D {\n");
+        // define nodes    
+        for (int i=0; i< size(); i++) {
+            sb.append(i +" [shape=box fillcolor=yellow]\n");
+        }
+        int index = 0;
+        // link nodes
+        if (root != null) {
+            if (root.isAParent()) {
+                graphVizLinkToChildren(0, 1, root,sb);
+            }
+        }
+        
+        sb.append("}");
+        PrintWriter pw = new PrintWriter(new File(filename));
+        pw.write(sb.toString());
+        pw.close();
+    }  
+    
+    private int graphVizLinkToChildren(int parentIndex, int currentIndex, MTQuadTreeNode current, StringBuilder sb) {
+        MTQuadTreeNode[] children = current.getChildren();
+        for (MTQuadTreeNode child : children) {
+            if (child != null){
+                // child is not null, so need to connect parent to child
+                sb.append(parentIndex + " -> " + currentIndex + "\n");
+                currentIndex = graphVizLinkToChildren(currentIndex, currentIndex+1, child,sb);
+            }
+        }
+        return currentIndex;
+    }
+    
+    
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new MTQuadTree1(numberOfObjectives);
     }

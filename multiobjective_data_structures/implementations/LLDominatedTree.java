@@ -17,9 +17,12 @@ public class LLDominatedTree
     private int size=0;
     private int numberOfObjectives;
     private int[] numberOfActiveElements;
-
-    LLDominatedTree(int numberOfObjectives) {
+    private LLObjectiveTree[] sortedListsOfObjectives; 
+    
+    
+    LLDominatedTree(int numberOfObjectives, LLObjectiveTree[] sortedListsOfObjectives) {
         this.numberOfObjectives = numberOfObjectives;
+        this.sortedListsOfObjectives = sortedListsOfObjectives;
         numberOfActiveElements = new int[numberOfObjectives];
     }
 
@@ -186,7 +189,7 @@ public class LLDominatedTree
     void add(FETreeSolutionWrapper trackedPoint) {
         //System.out.println("In DTree add");
         if (size==0) {
-            System.out.println("In DTree add, size =0");
+            //System.out.println("In DTree add, size =0");
             FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,true);
             this.numberOfActiveElements[0] = 1;
             for (int i=1; i < numberOfObjectives; i++)
@@ -194,17 +197,18 @@ public class LLDominatedTree
             head = cp;
             tail = cp;
         } else {
-            System.out.println("In DTree add, size !=0");
+            //System.out.println("In DTree add, size !=0");
             if (trackedPoint.weaklyDominates(head)) {
-                System.out.println("tp weak doms head");
+                //System.out.println("tp weak doms head");
                 int index = getMaxNullElement();
                 FETreeCompositePoint cp = new FETreeCompositePoint(trackedPoint,index,true);
                 this.numberOfActiveElements[index]++;
                 head.setPrevious(cp);
                 cp.setNext(head);
                 head = cp;
+                //System.out.println(">>> new head:" + head);
             } else {
-                System.out.println("tp not weak doms head");
+                //System.out.println("tp not weak doms head");
                 //get worst non-(weak)dominated by trackedPoint. If null, has at least one value worse than any previously seen
                 FETreeCompositePoint lowerNode = getWorstNotWeaklyDominated(trackedPoint);
                 if (lowerNode==null)
@@ -222,7 +226,7 @@ public class LLDominatedTree
                         }
                     } // don't do anything otherwise, as these values will be inferred from the previous
                 }
-                // indsert into element with fewest active elements
+                // insert into element with fewest active elements
                 insertedNode.setElement(indexToInsert, trackedPoint);
                 numberOfActiveElements[indexToInsert]++;
                 trackedPoint.setDominatedTreeCompositeMember(insertedNode);
@@ -388,4 +392,93 @@ public class LLDominatedTree
         }
         return text;
     }
+    
+    boolean remakeTreeFromSortedLists(int totalNumberOfSolutions, boolean oldFlag) {
+        if (tail==head)
+            return oldFlag; // do nothing if tree is still this small!
+        for (int i=0; i<numberOfObjectives; i++)
+            numberOfActiveElements[i] = 0;
+        FETreeCompositePoint current = tail;
+        // ready the head 
+        //    head.cleanDeepLinks();
+        //    head.instantiateDeepNodeSolutions();
+        
+        LLWrappedObjectiveNode[] currentPoint = new LLWrappedObjectiveNode[numberOfObjectives];
+        //boolean oldFlag = currentPoint[0].getCargo().getCurrentFlag(); // get state of flag in members
+
+        // MAKE NEW TAIL
+        currentPoint[0] = sortedListsOfObjectives[0].getTail();
+        tail.setElement(0, currentPoint[0].getCargo());
+        currentPoint[0].getCargo().switchFlag(); // mark as now inserted  
+        numberOfActiveElements[0]++; // increment number active on this dimension of the tree composite points
+        int inserted = 1;
+        for (int i=1; i<numberOfObjectives; i++) {
+            currentPoint[i] = sortedListsOfObjectives[i].getTail();
+            if (currentPoint[i].getCargo().getCurrentFlag() != oldFlag) { // if already inserted earlier in tail
+                tail.setElement(i, null);
+            } else { 
+                tail.setElement(i, currentPoint[i].getCargo());
+                currentPoint[i].getCargo().switchFlag(); // mark as now inserted 
+                currentPoint[i].getCargo().setDominatedTreeCompositeMember(current); // update which composite point this solution is in
+                numberOfActiveElements[i]++; // increment number active on this dimension of the tree composite points
+                inserted++;
+            }
+        }
+        size = 1; // reset size
+        // MAKE REST OF DATA STRUCTURE
+        //System.out.println("Head remade " + inserted + " solutions inserted");
+        while (inserted < totalNumberOfSolutions) {
+            current = current.getPrevious(); // shift down composite point to refill
+            for (int i=0; i<numberOfObjectives; i++) {
+                while ((currentPoint[i]!=null) && (currentPoint[i].getCargo().getCurrentFlag() != oldFlag)) { // if tail not reached and if already inserted
+                    //System.out.println("Jumping..." + currentPoint[i].getCargo() + " flag " + currentPoint[i].getCargo().getCurrentFlag() + " "+ i);
+                    currentPoint[i] = currentPoint[i].getPrevious(); // jump over solutions already added
+                }
+                //System.out.println(currentPoint[i]);
+                //System.out.println("Inserting..." + i);
+
+                // now put in composite point
+                if (currentPoint[i] != null) {
+                    if (currentPoint[i].getCargo().getCurrentFlag() == oldFlag) { // check again that not inserted
+                        current.setElement(i,currentPoint[i].getCargo()); // put in compsite point
+                        currentPoint[i].getCargo().switchFlag(); // mark as now inserted
+                        currentPoint[i].getCargo().setDominatedTreeCompositeMember(current); // update which composite point this solution is in
+                        numberOfActiveElements[i]++;
+                        inserted++;
+                    } else {
+                        // special case where this cargo has literally just been inserted in same composite point
+                        // for an earlier processed objective
+                        current.inferElementFromPrevious(i); 
+                    }
+                } else {// towards end and put all of this list of obectives in, so null infill for this objective
+                    current.inferElementFromPrevious(i);
+                }
+            }
+            //System.out.println(inserted + " solutions inserted");
+            size++; // track number of active composite points
+        }
+        
+        head = current; // set up new head
+        head.setPrevious(null);
+        head.cleanDeepLinks();
+        head.instantiateDeepNodeSolutions();
+        for (int i=0; i<numberOfObjectives; i++) {
+            if (!head.activeElement(i)) { // index not active
+                System.out.println(i + " not currently active in new head");
+                // pull down element from higher up tree, guaranteed to have a worse value on objective
+                // than other contributing members, given the sequence on filling from the tail
+                FETreeCompositePoint tracker = head.getNext();
+                while (!tracker.activeElement(i)) {
+                    System.out.println(i + " not currently active in next, moving up...");
+                    tracker = tracker.getNext();
+                }
+                head.setElement(i,tracker.getElement(i)); // copy from futher up
+                head.getElement(i).setDominatedTreeCompositeMember(current); // repoint cp mambership
+                tracker.inferElementFromPrevious(i);// clean from further up
+            }
+        }
+        
+        return !oldFlag; // switch flag tracker
+    }
+    
 }

@@ -17,14 +17,19 @@ public class LLNonDominatedTree
     private int size=0;
     private int numberOfObjectives;
     private int[] numberOfActiveElements;
+    private LLObjectiveTree[] sortedListsOfObjectives; 
 
-    LLNonDominatedTree(int numberOfObjectives) {
+    LLNonDominatedTree(int numberOfObjectives,LLObjectiveTree[] sortedListsOfObjectives) {
         this.numberOfObjectives = numberOfObjectives;
+        this.sortedListsOfObjectives = sortedListsOfObjectives;
         numberOfActiveElements = new int[numberOfObjectives];
         for (int i=0; i<numberOfObjectives; i++)
             numberOfActiveElements[i] = 0;
     }
 
+    /*
+     * gets index with most null elements (i.e. smallest number of active elements)
+     */
     private int getMaxNullElement() {
         int i = 0;
         int me = numberOfActiveElements[i];
@@ -131,6 +136,13 @@ public class LLNonDominatedTree
             head = cp;
             tail = cp;
             size++;
+            /*
+            // set up initial sorted lists of objectives, only need to manage
+            // in Nondominated and not dominated tree to avoid duplication -- 
+            // as reference is shared
+            for (int i=0; i < numberOfObjectives; i++)
+            sortedListsOfObjectives[i].addFirst(trackedPoint);
+             */  
             //trackedPoint.addToNonDominatedTreeTracking(cp);
         } else { // find first cp which does not weakly dominate argument
             FETreeCompositePoint higherNode = getFirstNonWeaklyDominating(trackedPoint);
@@ -173,7 +185,7 @@ public class LLNonDominatedTree
     private boolean sanityCheck() {
         if (head==null){
             if (tail!=null) {
-                System.out.println("head is null but tail isn't");
+                //System.out.println("head is null but tail isn't");
                 return false;
             } else 
                 return true;
@@ -186,7 +198,7 @@ public class LLNonDominatedTree
             l1++;
         }
         if (node!=tail) {
-            System.out.println("TAIL not at end");
+            //System.out.println("TAIL not at end");
             return false;
         }
         while (node.getPrevious()!=null) {
@@ -194,11 +206,11 @@ public class LLNonDominatedTree
             l2++;
         }
         if (node!=head) {
-            System.out.println("HEAD not at start");
+            //System.out.println("HEAD not at start");
             return false;
         }
         if (l1!=l2) {
-            System.out.println("length from head to tail is not same as tail to head");
+            //System.out.println("length from head to tail is not same as tail to head");
             return false;
         }
         return true;
@@ -313,8 +325,6 @@ public class LLNonDominatedTree
                         higherNode.inferElementFromPrevious(i);
                     } // if not infering from lower, don't need to do anything...
                 } else {
-                    //System.out.println("\nREPLACING : " + i + " na " + numberActive);
-
                     if (this.numberOfActiveElements[i] < numberActive) {
                         indexToInsert = i;
                         numberActive = numberOfActiveElements[i];
@@ -340,6 +350,82 @@ public class LLNonDominatedTree
         return node;
     }
 
+    
+    /*
+     * oldFlag is current flag used in system before remaking tree 
+     * 
+     * returns the switched flag
+     */
+
+    boolean remakeTreeFromSortedLists(int totalNumberOfSolutions, boolean oldFlag) {
+        
+        for (int i=0; i<numberOfObjectives; i++)
+            numberOfActiveElements[i] = 0;
+        FETreeCompositePoint current = head;
+        // first build head -- may need a deep copy if a solution minimises more than one criteria
+        head.cleanDeepLinks();
+        head.instantiateDeepNodeSolutions();
+        LLWrappedObjectiveNode[] currentPoint = new LLWrappedObjectiveNode[numberOfObjectives];
+        //boolean oldFlag = currentPoint[0].getCargo().getCurrentFlag(); // get state of flag in members
+
+        currentPoint[0] = sortedListsOfObjectives[0].getHead();
+        head.setElement(0, currentPoint[0].getCargo());
+        currentPoint[0].getCargo().switchFlag(); // mark as now inserted  
+        numberOfActiveElements[0]++; // increment number active on this dimension of the tree composite points
+        int inserted = 1;
+        for (int i=1; i<numberOfObjectives; i++) {
+            currentPoint[i] = sortedListsOfObjectives[i].getHead();
+            if (currentPoint[i].getCargo().getCurrentFlag() != oldFlag) { // if already inserted earlier in head
+                for (int j=0; j<i; j++) {
+                    if (head.getElement(j) == currentPoint[i].getCargo() ) { // if this element on jth objective already
+                        head.setDeepNodeSolution(i, j); // set deep node duplicate
+                        break;
+                    }
+                }
+            } else { 
+                head.setElement(i, currentPoint[i].getCargo());
+                currentPoint[i].getCargo().switchFlag(); // mark as now inserted  
+                numberOfActiveElements[i]++; // increment number active on this dimension of the tree composite points
+                inserted++;
+            }
+        }
+        size = 1; // reset size
+        
+        //System.out.println("Head remade " + inserted + " solutions inserted");
+        while (inserted < totalNumberOfSolutions) {
+            current = current.getNext(); // shift up composite point to refill
+            for (int i=0; i<numberOfObjectives; i++) {
+                while ((currentPoint[i]!=null) && (currentPoint[i].getCargo().getCurrentFlag() != oldFlag)) { // if tail not reached and if already inserted
+                    //System.out.println("Jumping..." + currentPoint[i].getCargo() + " flag " + currentPoint[i].getCargo().getCurrentFlag() + " "+ i);
+                    currentPoint[i] = currentPoint[i].getNext(); // jump over solutions already added
+                }
+                //System.out.println(currentPoint[i]);
+                //System.out.println("Inserting..." + i);
+
+                // now put in composite point
+                if (currentPoint[i] != null) {
+                    if (currentPoint[i].getCargo().getCurrentFlag() == oldFlag) { // check again that not inserted
+                        current.setElement(i,currentPoint[i].getCargo()); // put in compsite point
+                        currentPoint[i].getCargo().switchFlag(); // mark as now inserted
+                        numberOfActiveElements[i]++;
+                        inserted++;
+                    } else {
+                        // special case where this cargo has literally just been inserted in same composite point
+                        // for an earlier processed objective
+                        current.inferElementFromPrevious(i); 
+                    }
+                } else {// towards end and put all of this list of obectives in, so null infill for this objective
+                    current.inferElementFromPrevious(i);
+                }
+            }
+            //System.out.println(inserted + " solutions inserted");
+            size++; // track number of active composite points
+        }
+        tail = current; // set up new tail
+        tail.setNext(null);
+        return !oldFlag; // switch flag tracker
+    }
+
     /**
      * Potential for dominatedSet to contain a null element
      */
@@ -352,7 +438,7 @@ public class LLNonDominatedTree
         // first clean all composite points which are strictly dominated
         while (trackedPoint.strictlyDominates(tail)) {
             //System.out.println("NDTree tail strictly dominated by tracked point, cleaning out and going to next");
-            
+
             for (int i=0; i<numberOfObjectives; i++) {
                 if (tail.getElement(i)!=null) {
                     dominatedSet.add(tail.getElement(i));

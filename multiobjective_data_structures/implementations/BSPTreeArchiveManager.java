@@ -10,10 +10,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
- * NEED TO IMPLEMENT REBALANCING
+ * Implementation of the BSPTreeArchiveManager, based on:
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * Tobias Glasmachers. 2017. 
+ * A Fast Incremental BSP Tree Archive for Nondominated Points. 
+ * In International Conference on Evolutionary Multi-Criterion Optimization, EMO 2017 (LNCS), 
+ * H. Trautmann et al. (Ed.), Vol. 10173. Springer, 252--266
+ * 
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public class BSPTreeArchiveManager implements ParetoSetManager
 {
@@ -22,11 +27,17 @@ public class BSPTreeArchiveManager implements ParetoSetManager
     private final int NUMBER_OF_OBJECTIVES;
     private double rebalanceFactor = 6; // called 'z' in the original paper
 
+    /*
+     * Constructor to be called by factory method
+     */
     private BSPTreeArchiveManager(int numberOfObjectives) {
         root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
     }
-
+    
+    /*
+     * Constructor to be called by factory method
+     */
     private BSPTreeArchiveManager(int numberOfObjectives, int maxLeafSize) {
         root = new BSPTreeNode(new ArrayList<Solution>(maxLeafSize+1), numberOfObjectives, null);
         this.maxLeafSize = maxLeafSize;
@@ -65,6 +76,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return true;
     }
 
+    /*
+     * Helper method for dominance checks
+     */
     private int processLeafForDominanceCheck(BSPTreeNode node, Solution s)
     {
         int k=0;
@@ -86,6 +100,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return k;
     }
 
+    /*
+     * Helper method for dominance checks
+     */
     private int checkDominance(BSPTreeNode node, Solution s,  TreeSet<Integer> b, TreeSet<Integer> w) {
         int k = 0;
         if (!node.isInteriorNode()) {
@@ -143,6 +160,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return k;
     }
 
+   /*
+    * Helper method to check for dominance without changing the state of the tree
+    */
     private int checkForDominanceWithoutChangingState(BSPTreeNode node, Solution s,  TreeSet<Integer> b, TreeSet<Integer> w) {
         int k = 0;
         if (!node.isInteriorNode()) {
@@ -197,6 +217,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return contents;
     }
 
+    /*
+     * Helper method to recusrively filled the arraylist argument with the node contents, and the subtree rooted at it
+     */
     private void recursivelyFillWithContents(BSPTreeNode node, ArrayList<Solution> contents) {
         if (node.isInteriorNode()) {
             recursivelyFillWithContents(node.getLeft(), contents);
@@ -206,7 +229,10 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         }
     }
 
-    public int deepGetNumberCovered() {
+    /*
+     *  Get number of deep covered 
+     */
+    private int deepGetNumberCovered() {
         return root.getDeepCovered();
     }
 
@@ -231,6 +257,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         throw new UnsupportedOperationException();
     }
 
+    /*
+     * Helper method for string representation of node 
+     */
     private String rescursivelyAddToString(BSPTreeNode node, String s) {
         if (node.isInteriorNode()) {
             s += " index " + node.getObjectiveIndex() + " < " + node.getTheta() + " " + rescursivelyAddToString(node.getLeft(), s);
@@ -279,6 +308,9 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         pw.close();
     }  
     
+    /*
+     * Helper method for GrpahViz file construction
+     */
     private int graphVizLinkToChildren(int parentIndex, int currentIndex, BSPTreeNode current, StringBuilder sb, ArrayList<Integer> leafIndices, ArrayList<Integer> interiorIndices) {
         
         if (current.isInteriorNode()) {
@@ -297,10 +329,18 @@ public class BSPTreeArchiveManager implements ParetoSetManager
         return currentIndex;
     }
     
+    /**
+     * Returns instance of the manager for the number of objectives argument and
+     * max leaf size passed
+     */
     public static ParetoSetManager managerFactory(int numberOfObjectives, int maxLeafSize) {
         return new BSPTreeArchiveManager(numberOfObjectives,maxLeafSize);
     }
 
+    /**
+     * Returns instance of the manager for the number of objectives argument, with the default
+     * max leaf size of 20
+     */
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new BSPTreeArchiveManager(numberOfObjectives);
     }

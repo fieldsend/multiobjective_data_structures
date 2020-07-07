@@ -9,7 +9,11 @@ import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 
 /**
- * NDTree, implementation of ND tree by Jaszkiewicz and Lust.
+ * NDTree, implementation of ND tree by Jaszkiewicz and Lust. Based on
+ * 
+ * Andrzej Jaszkiewicz and Thibaut Lust. 2018. 
+ * ND-Tree-Based Update: A Fast Algorithm for the Dynamic Nondominance Problem. 
+ * IEEE Transactions on Evolutionary Computation 22, 5 (2018), 778--791
  * 
  * @author Jonathan Fieldsend
  * @version 1
@@ -20,17 +24,24 @@ public class NDTree implements ParetoSetManager
     private int maxListSizePerNode = 20;
     private int numberOfChildrenPerNode;
     
+    /*
+     * Constructor -- called by factory method
+     */
     private NDTree(int numberOfObjectives) {
         numberOfChildrenPerNode = numberOfObjectives + 1;
         root = new NDTreeNode(maxListSizePerNode,numberOfChildrenPerNode);
     }
     
+    /*
+     * Constructor -- called by factory method
+     */
     private NDTree(int maxListSizePerNode, int numberOfChildrenPerNode) {
         this.maxListSizePerNode = maxListSizePerNode;
         this.numberOfChildrenPerNode = numberOfChildrenPerNode;
         root = new NDTreeNode(maxListSizePerNode,numberOfChildrenPerNode);
     }
     
+    @Override
     public boolean add(Solution s) throws IllegalNumberOfObjectivesException 
     {
         if (root.isEmpty()) {
@@ -49,9 +60,7 @@ public class NDTree implements ParetoSetManager
         return false;
     }
     
-    /**
-     * returns true if this pareto set weakly dominates s
-     */
+    @Override
     public boolean weaklyDominates(Solution s) throws IllegalNumberOfObjectivesException
     {
         if (root.isEmpty()) {
@@ -61,9 +70,7 @@ public class NDTree implements ParetoSetManager
         }
     }
     
-    /**
-     * Returns contents of the set in an array.
-     */
+    @Override
     public Collection<? extends Solution> getContents()
     {
         List<Solution> s = new ArrayList<Solution>(this.size());
@@ -72,21 +79,18 @@ public class NDTree implements ParetoSetManager
         return s;
     }
     
-    /**
-     * Returns the number of elements of the set (the number of non-dominated solutions). 
-     */
+    @Override
     public int size() {
         return root.coverage();
     }
     
-    /**
-     * Cleans the set. Removes all elements.
-     */
+    @Override
     public void clean()
     {
         root = null;
     }
     
+    @Override
     public Solution getRandomMember() throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException();
@@ -127,6 +131,9 @@ public class NDTree implements ParetoSetManager
         pw.close();
     }  
     
+    /*
+     * Helper method for the GraphViz file writer
+     */
     private int graphVizLinkToChildren(int parentIndex, int currentIndex, NDTreeNode current, StringBuilder sb, ArrayList<Integer> leafIndices, ArrayList<Integer> interiorIndices) {
         
         if (!current.isLeaf()) {
@@ -144,7 +151,19 @@ public class NDTree implements ParetoSetManager
         return currentIndex;
     }
     
+    /**
+     * Returns an NDTree instance to maintain an archive with the number of objectives 
+     * passed as an argument. Uses a default bin size of 20 in leaves
+     */
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new NDTree(numberOfObjectives);
+    }
+    
+    /**
+     * Returns an NDTree instance to maintain an archive with the number of objectives 
+     * passed as an argument, and the number of solutions binned per leaf node
+     */
+    public static ParetoSetManager managerFactory(int numberOfObjectives,int numberOfChildrenPerNode) {
+        return new NDTree(numberOfObjectives,numberOfChildrenPerNode);
     }
 }

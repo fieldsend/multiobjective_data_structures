@@ -11,10 +11,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
- * Write a description of class LinearListManager here.
+ * LinearListManager stores and manages a non-dominated set as a linear list.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public class LinearListManager implements ParetoSetManager
 {
@@ -22,13 +22,28 @@ public class LinearListManager implements ParetoSetManager
     private List<Solution> contents = new ArrayList<>();
     private Random randomNumberGenerator;
     
-    private LinearListManager(long seed, int numberOfObjectives, boolean array)
+    /*
+     * Constructor takes in seed for the random number generator used when
+     * calling getRandomMember(), the number of objectives of solutions to store. 
+     * Uses an ArrayList to store the archive
+     */
+    private LinearListManager(long seed, int numberOfObjectives)
     {
         randomNumberGenerator = new Random(seed);
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
-        if (array)
-            contents = new ArrayList<>();
-        else
+        contents = new ArrayList<>();
+    }
+    
+    /*
+     * Constructor takes in seed for the random number generator used when
+     * calling getRandomMember(), the number of objectives of solutions to store, and 
+     * a flag for whether an array list (true) or linked list (false) is used. 
+     * Empirically the array list option performs better on the sequences tested.
+     */
+    private LinearListManager(long seed, int numberOfObjectives, boolean array)
+    {
+        this(seed, numberOfObjectives);
+        if (!array)
             contents = new LinkedList<>();
     }
     
@@ -86,10 +101,24 @@ public class LinearListManager implements ParetoSetManager
         contents.clear();
     }
     
+    /**
+     * Returns an instance of LinearList manager. Takes in seed for the random number generator used when
+     * calling getRandomMember(), the number of objectives of solutions to store. 
+     * Uses an ArrayList to store the archive
+     */
+    public static ParetoSetManager managerFactory(long seed, int numberOfObjectives) throws IllegalNumberOfObjectivesException
+    {
+        return new LinearListManager(seed, numberOfObjectives);
+    }
+    
+    /**
+     * Returns an instance of LinearList manager. Takes in seed for the random number generator used when
+     * calling getRandomMember(), the number of objectives of solutions to store, and 
+     * a flag for whether an array list (true) or linked list (false) is used. 
+     * Empirically the array list option performs better on the sequences tested.
+     */
     public static ParetoSetManager managerFactory(long seed, int numberOfObjectives, boolean array) throws IllegalNumberOfObjectivesException
     {
-        //if (numberOfObjectives != 2)
-        //    throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");
         return new LinearListManager(seed, numberOfObjectives, array);
     }
     

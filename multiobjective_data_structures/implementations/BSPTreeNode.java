@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Collections;
 /**
- * Write a description of class BSPTreeNode here.
+ * BSPTreeNode defines nodes used by the BSPTree.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public class BSPTreeNode
 {

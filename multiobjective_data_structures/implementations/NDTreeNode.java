@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 
 /**
- * Write a description of class NDTreeNode here.
+ * NDTreeNode defines nodes used in the NDTree.
  * 
  * @author Jonathan Fieldsend
  * @version 1
@@ -25,6 +25,9 @@ public class NDTreeNode
     private static int MAX_LIST_SIZE;
     private static int NUMBER_OF_CHILDREN;
     
+    /**
+     * Node constructor -- only used to make root as doesn't connect upwards to a parent
+     */
     NDTreeNode(int maxListSize, int numberOfChildren) {
         if (maxListSize < numberOfChildren){
             System.out.println("Maximum list size must be at least as big as the number of children");
@@ -35,16 +38,24 @@ public class NDTreeNode
         list = new ArrayList<Solution>(MAX_LIST_SIZE+1);
     }
     
+    /*
+     * Construct a node connected to parent
+     */
     private NDTreeNode(int maxListSize, int numberOfChildren, NDTreeNode parent) {
         this(maxListSize, numberOfChildren);
         this.parent = parent;
     }
     
-    
+    /**
+     * Returns a list of the (NDTreeNode) children of this node
+     */
     List<NDTreeNode> getChildren() {
         return children;
     }
     
+    /**
+     * Adds a solution covered by this node and updates the Ideal and Nadir points correspondingly
+     */
     void add(Solution solution){
         list.add(solution);
         if (list.size()==1)
@@ -53,7 +64,9 @@ public class NDTreeNode
             updateIdealNadir(solution);
     }
     
-    
+    /*
+     * Helper method to convert double array to a string representation of contents
+     */
     private String stringConvert(double[] x){
         String s = "";
         if (x==null)
@@ -63,18 +76,30 @@ public class NDTreeNode
         return s;
     }
     
+    /**
+     * Returns a String representation of the ideal point of this node
+     */
     String idealAsString() {
         return stringConvert(idealPointEstimate);
     }
     
+    /**
+     * Returns a String representation of the nadir point of this node
+     */
     String nadirAsString() {
         return stringConvert(nadirPointEstimate);
     }
     
+    /**
+     * Returns a String representation of the mid point of this node
+     */
     String midpointAsString() {
         return stringConvert(midpoint);
     }
     
+    /*
+     * Helper method to set the ideal and nadir based on solution argument
+     */
     private void setIdealNadir(Solution solution){
         idealPointEstimate = new double[solution.getNumberOfObjectives()];
         nadirPointEstimate = new double[solution.getNumberOfObjectives()];
@@ -86,6 +111,9 @@ public class NDTreeNode
         }
     }
     
+    /* 
+     * Helper method to update the ideal and nadir based on solution argument
+     */
     private void updateIdealNadir(Solution solution){
         for (int i = 0; i < solution.getNumberOfObjectives(); i++){
             if (solution.getFitness(i) < idealPointEstimate[i]){
@@ -100,16 +128,26 @@ public class NDTreeNode
             parent.updateIdealNadir(solution);
     }
     
+    /**
+     * Return true if node list is empty (i.e. this is an internal node) otherwise
+     * returns false (i.e. this is a leaf node)
+     */
     boolean isEmpty(){
         if (list == null)
             return false; // if list is null, then is an internal node with children
         return list.isEmpty(); 
     }
     
+    /**
+     * Returns true if this is a leaf node, false otherwise
+     */
     boolean isLeaf() {
         return children == null;
     }
     
+    /**
+     * Returns true if this is the root node, false otherwise
+     */
     boolean isRoot() {
         return parent == null;
     }
@@ -117,7 +155,6 @@ public class NDTreeNode
     /**
      * Checks if a solution is weakly-dominated by the archive -- added functionality to meet 
      * requirements of archive management interface
-     * 
      */
     boolean weaklyDominates(Solution solution) {
         if (Solution.weaklyDominates(nadirPointEstimate,solution))
@@ -147,7 +184,6 @@ public class NDTreeNode
      * returns false if solution is dominated, else removed all dominated solutions and 
      * returns true -- does not insert the argument though!
      */
-    
     boolean updateNode(Solution solution, ListIterator<NDTreeNode> iteratorAbove){
         /*System.out.println("Ideal: " + idealAsString());
         System.out.println("Nadir: " + nadirAsString());
@@ -222,10 +258,9 @@ public class NDTreeNode
         return true; // not dominated by any solution ith node
     }    
     
-    //private void removeChild(NDTreeNode childToRemove){
-    //    children.remove(childToRemove);
-    //}
-    
+    /**
+     * Inserts solution in this node or futher down tree
+     */
     void insert(Solution solution) {
         if  (this.isLeaf()) {
             list.add(solution);
@@ -238,6 +273,9 @@ public class NDTreeNode
         }
     }
     
+    /*
+     * Helper method to split this node  -- used when leaf capacity reached
+     */
     private void split() {
         //System.out.println("Splitting node...");
         // find solution with highest average distance to all other solutions
@@ -314,6 +352,9 @@ public class NDTreeNode
         list = null;
     }
     
+    /*
+     * Helper method to get closest child node for solution
+     */
     private NDTreeNode getClosestChild(Solution solution){
         double distance = NDTreeNode.squaredDistance(children.get(0).midpoint,solution);
         int closestChild = 0;
@@ -327,6 +368,9 @@ public class NDTreeNode
         return children.get(closestChild);
     }
     
+    /*
+     * Helper method to get squared distances of objective vectors of two solutions
+     */
     private static double squaredDistance(Solution a, Solution b) {
         double distance = 0.0;
         for (int i=0; i<a.getNumberOfObjectives(); i++)
@@ -334,7 +378,9 @@ public class NDTreeNode
         return distance;
     }
     
-    
+    /*
+     * Helper method to get squared distances of objective vector and a solutions
+     */
     private static double squaredDistance(double[] a, Solution b) {
         double distance = 0.0;
         for (int i=0; i<a.length; i++)
@@ -342,6 +388,9 @@ public class NDTreeNode
         return distance;
     }
     
+    /**
+     * Returns the number of solutions covered by the (sub)tree rooted at this node
+     */
     public int coverage() {
         if  (this.isLeaf()) {
             return list.size();
@@ -355,6 +404,9 @@ public class NDTreeNode
         }
     }
     
+    /**
+     * Recursively extracts all solutions covered by the (sub)tree rooted at this node
+     */
     public void recursivelyExtract(List<Solution> a){
         if  (!this.isLeaf()) 
            for (int i=0; i<children.size(); i++) 

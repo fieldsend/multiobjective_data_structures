@@ -129,7 +129,9 @@ public class BSPTreeNode
         right = right.right;
     }
 
-    // pull in contents from smaller child and re-distribute
+    /**
+     * pulls in contents from smaller child and re-distributes
+     */ 
     void rebalance(int maxLeafSize) {
         ArrayList<Solution> setToReinsert;
         /*System.out.println("REBALANCING " + left.getNumberCovered()+" " +right.getNumberCovered() + " " +getNumberCovered());

@@ -3,10 +3,10 @@ import multiobjective_data_structures.*;
 
 
 /**
- * Write a description of class MTQuadTreeNode here.
+ * MTQuadTreeNode defines nodes used by the quad tree implementations.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public class MTQuadTreeNode
 {

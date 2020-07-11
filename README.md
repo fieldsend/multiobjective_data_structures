@@ -18,7 +18,7 @@ pages 489-497</br>
 
 ## multiobjective_data_structures.implementations
  
-<p>Contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). The Linear List, the Balanced Binary Tree (for bi-objectove problems only), Quad Tree variants 1, 2, and 3, the Dominance Decision Tree, The BSP Tree, and the ND Tree</p>
+<p>Contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). The Linear List, the Balanced Binary Tree (for bi-objective problems only), Quad Tree variants 1, 2, and 3, the Dominance Decision Tree, The BSP Tree, and the ND Tree</p>
 
 ## multiobjective_data_structures.tests
 
@@ -30,7 +30,7 @@ pages 489-497</br>
 
   <code>Experiments.dtlzExperiments()</code>
 
-<p>Will run each data structure in the package 30 times on each of DTLZ1 and DTLZ2 using a (1+1)--ES for 200 000 generations, for 2, 3, 5 and 10 objective dimensions, and write out timings results to file for each combination. Note the performance of some data structures serious degrades as the archive size and/or number of objectives increases, so unless you have cycles to burn you might not want to run all combinations(!).</p>
+<p>Will run each data structure in the package 30 times on each of DTLZ1 and DTLZ2 using a (1+1)--ES for 200,000 generations, for 2, 3, 5 and 10 objective dimensions, and write out timings results to file for each combination. Note the performance of some data structures serious degrades as the archive size and/or number of objectives increases, so unless you have cycles to burn you might not want to run all combinations(!).</p>
 
   <code>Experiments.simulationExperiments()</code>
 
@@ -46,7 +46,7 @@ pages 489-497</br>
 
 <p>Most classes have JavaDoc for the methods -- I'll be tidying these up a bit post-GECCO, but often the internal variables are named according to the convention of the source paper (unless I made a decision that the name was too opaque).</p>
 
-<p>For computational efficiency the QuadTree apporaches precomute an array of arrays of child indices, rather than reclaculating them on the fly each time. This saves wasted computation, however due to the power term (it is 2^numberOfObjectives by 2^numberOfObjectives) for a high numberOfObjectives this is likely to hit memory bounds. Other data structures don't have this issue, and I'll likely develop an 'on the fly' version in the next substantial release for the QuadTree.</p>
+<p>For computational efficiency the QuadTree apporaches precompute an array of arrays of child indices, rather than reclaculating them on the fly each time. This saves wasted computation, however due to the power term (it is 2^numberOfObjectives by 2^numberOfObjectives) for a high numberOfObjectives this is likely to hit memory bounds. Other data structures don't have this issue, and I'll likely develop an 'on the fly' version in the next substantial release for the QuadTree.</p>
 
 
 

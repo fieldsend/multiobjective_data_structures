@@ -30,7 +30,7 @@ pages 489-497</br>
 
   <code>Experiments.dtlzExperiments()</code>
 
-<p>Will run each data structure in the package 30 times on each of DTLZ1 and DTLZ2 using a (1+1)--ES for 200 000 generations, for 2, 3, 5 and 10 objective dimensions, and write out timings results to file for each combination. Note the performance of some data structures serious degrades as the archive size and/or number of objectives increases, so unless you have cycles to burn you might not want to run all combinations(!).</p>
+<p>Will run each data structure in the package 30 times on each of DTLZ1 and DTLZ2 using a (1+1)--ES for 200,000 generations, for 2, 3, 5 and 10 objective dimensions, and write out timings results to file for each combination. Note the performance of some data structures serious degrades as the archive size and/or number of objectives increases, so unless you have cycles to burn you might not want to run all combinations(!).</p>
 
   <code>Experiments.simulationExperiments()</code>
 

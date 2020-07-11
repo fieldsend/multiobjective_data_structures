@@ -46,7 +46,7 @@ pages 489-497</br>
 
 <p>Most classes have JavaDoc for the methods -- I'll be tidying these up a bit post-GECCO, but often the internal variables are named according to the convention of the source paper (unless I made a decision that the name was too opaque).</p>
 
-<p>For computational efficiency the QuadTree apporaches precomute an array of arrays of child indices, rather than reclaculating them on the fly each time. This saves wasted computation, however due to the power term (it is 2^numberOfObjectives by 2^numberOfObjectives) for a high numberOfObjectives this is likely to hit memory bounds. Other data structures don't have this issue, and I'll likely develop an 'on the fly' version in the next substantial release for the QuadTree.</p>
+<p>For computational efficiency the QuadTree apporaches precompute an array of arrays of child indices, rather than reclaculating them on the fly each time. This saves wasted computation, however due to the power term (it is 2^numberOfObjectives by 2^numberOfObjectives) for a high numberOfObjectives this is likely to hit memory bounds. Other data structures don't have this issue, and I'll likely develop an 'on the fly' version in the next substantial release for the QuadTree.</p>
 
 
 

@@ -18,7 +18,7 @@ pages 489-497</br>
 
 ## multiobjective_data_structures.implementations
  
-<p>Contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). The Linear List, the Balanced Binary Tree (for bi-objectove problems only), Quad Tree variants 1, 2, and 3, the Dominance Decision Tree, The BSP Tree, and the ND Tree</p>
+<p>Contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). The Linear List, the Balanced Binary Tree (for bi-objective problems only), Quad Tree variants 1, 2, and 3, the Dominance Decision Tree, The BSP Tree, and the ND Tree</p>
 
 ## multiobjective_data_structures.tests
 

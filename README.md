@@ -8,13 +8,13 @@ Proceedings of the 2020 Genetic and Evolutionary Computation Conference</br>
 pages 489-497</br>
 2020</p>
 
-<p>and additionally the source of the base data structure employed (see reference list in the citation above for the various data structures, and/or JavaDoc).</p>
+<p>and additionally the source of the base data structure employed (see reference list in the citation above for the various data structures, and/or API documentation generated from the codebase using the <code>javadoc</code> tool).</p>
 
 <p>The packages are detailed below at a high level -- package documentation gives further details.</p>
 
 ## multiobjective_data_structures
 
-<p>contains the various interfaces, abstract types and Exceptions core to the package. Primarily the <code>ParetotSetManager</code> interface which all of the data structures implement, and define their core functionality.</p>
+<p>contains the various interfaces, abstract types and Exceptions core to the package. Primarily the <code>ParetoSetManager</code> interface which all of the data structures implement, and define their core functionality.</p>
 
 ## multiobjective_data_structures.implementations
  

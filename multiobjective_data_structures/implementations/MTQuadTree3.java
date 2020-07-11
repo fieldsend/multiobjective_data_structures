@@ -4,14 +4,29 @@ import multiobjective_data_structures.*;
 import java.util.ArrayList;
 
 /**
- * Write a description of class MTQuadTree3 here.
+ * Implementation of the Quad Tree variant 3, see 
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * Sanaz Mostaghim, J¨urgen Teich, and Ambrish Tyagi. 2002. 
+ * Comparison of data structures for storing Pareto-sets in MOEAs. 
+ * In IEEE Congress on Evolutionary Computation, 2002. CEC ‘02. IEEE
+ *
+ * and
+ *
+ * Sanaz Mostaghim and J¨urgen Teich. 2003. 
+ * Quad-trees: A Data Structure for Storing Pareto-sets in Multi-objective Evolutionary Algorithms with Elitism. 
+ * In Evolutionary Multiobjective Optimization, 
+ * Ajith Abraham, Lakhmi Jain, and Robert Goldberg (Eds.). 
+ * Springer, 81–104
+ * 
+ * @author Jonathan Fieldsend 
+ * @version 1.0
  */
 public class MTQuadTree3 extends MTQuadTree1
 {
 
+    /** 
+     * Constrcutor to be called by factory method
+     */
     private MTQuadTree3(int numberOfObjectives) { 
         super(numberOfObjectives);
     }
@@ -159,6 +174,10 @@ public class MTQuadTree3 extends MTQuadTree1
         parent.removeChild(indexOfChild);
     }
     
+    /**
+     * Factory method to return and instance of ParetoSetManager to maintain the
+     * solutions with the number of objectives passed as an argument
+     */
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new MTQuadTree3(numberOfObjectives);
     }

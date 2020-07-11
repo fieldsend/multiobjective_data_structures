@@ -4,10 +4,11 @@ import multiobjective_data_structures.*;
 
 import java.util.ArrayList;
 /**
- * Write a description of class MTHelperClass here.
+ * MTHelperClass provides a set of helper methods required by the various
+ * Quad Tree implementations
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Jonathan Fieldsend
+ * @version 1.0
  */
 public class MTHelperClass
 {

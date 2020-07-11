@@ -12,10 +12,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
- * Write a description of class MTQuadTree1 here.
+ * Implementation of the Quad Tree variant 1, see 
  * 
- * @author Jonathan Fieldsend
- * @version 0.1
+ * Sanaz Mostaghim, J¨urgen Teich, and Ambrish Tyagi. 2002. 
+ * Comparison of data structures for storing Pareto-sets in MOEAs. 
+ * In IEEE Congress on Evolutionary Computation, 2002. CEC ‘02. IEEE
+ *
+ * and
+ *
+ * Sanaz Mostaghim and J¨urgen Teich. 2003. 
+ * Quad-trees: A Data Structure for Storing Pareto-sets in Multi-objective Evolutionary Algorithms with Elitism. 
+ * In Evolutionary Multiobjective Optimization, 
+ * Ajith Abraham, Lakhmi Jain, and Robert Goldberg (Eds.). 
+ * Springer, 81–104
+ * 
+ * @author Jonathan Fieldsend 
+ * @version 1.0
  */
 public class MTQuadTree1 implements ParetoSetManager
 {
@@ -30,6 +42,9 @@ public class MTQuadTree1 implements ParetoSetManager
     int lChildrenSet0Indices[][]; // holds array of indices for all indexs where corresonding 0 bits are in same place and index is lower
     int lChildrenSet1Indices[][]; // holds array of indices for all indexs where corresonding 1 bits are in same place and index is higher
 
+    /** 
+     * Constructor to be used by the factory method and subtypes
+     */
     MTQuadTree1(int numberOfObjectives) { 
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
         elementWeights = new int[numberOfObjectives];
@@ -181,7 +196,9 @@ public class MTQuadTree1 implements ParetoSetManager
     }
 
     
-    /* returns true if s dominated by any sucessors of n*/
+    /**
+     * returns true if s dominated by any sucessors of n
+     */
     boolean recursiveDominatedCheck(Solution s, MTQuadTreeNode n) {
         int k = s.worseOrEqualIndex(n.getCargo(),elementWeights);
         if (k==MAX_INDEX)
@@ -299,7 +316,10 @@ public class MTQuadTree1 implements ParetoSetManager
         return currentIndex;
     }
     
-    
+    /**
+     * Factory method to return and instance of ParetoSetManager to maintain the
+     * solutions with the number of objectives passed as an argument
+     */
     public static ParetoSetManager managerFactory(int numberOfObjectives) {
         return new MTQuadTree1(numberOfObjectives);
     }

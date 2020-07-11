@@ -10,7 +10,7 @@ pages 489-497</br>
 
 <p>and additionally the source of the base data structure employed (see reference list in the citation above for the various data structures, and/or JavaDoc).</p>
 
-<p>The package</p>
+<p>The packages are detailed below at a high level -- package documentation gives further details.</p>
 
 ## multiobjective_data_structures
 

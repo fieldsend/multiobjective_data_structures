@@ -23,7 +23,11 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
     private DDTNode root;
     public final int NUMBER_OF_OBJECTIVES; // number of objectives of solutions being managed
     private int size = 0;
-    DominanceDecisionTreeManager(int numberOfObjectives) {
+    
+    /*
+     * Constructor used by factory method
+     */
+    private DominanceDecisionTreeManager(int numberOfObjectives) {
         NUMBER_OF_OBJECTIVES = numberOfObjectives;
     }
 
@@ -165,6 +169,10 @@ public class DominanceDecisionTreeManager implements ParetoSetManager
                 recursivelyExtract(child, contents);
     }
 
+    /**
+     * Factory method to return and instance of ParetoSetManager to maintain the
+     * solutions with the number of objectives passed as an argument
+     */
     public static DominanceDecisionTreeManager managerFactory(int numberOfObjectives) {
         return new DominanceDecisionTreeManager(numberOfObjectives);
     }

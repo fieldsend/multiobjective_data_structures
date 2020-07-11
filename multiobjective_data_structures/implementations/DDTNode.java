@@ -3,10 +3,10 @@ import multiobjective_data_structures.*;
 
 
 /**
- * Write a description of class DDTNode here.
+ * DDTNode defines the nodes used by the Dominance Decision Tree.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Jonathan Fieldsend 
+ * @version 1.0
  */
 class DDTNode
 {

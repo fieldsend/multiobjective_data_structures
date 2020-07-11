@@ -114,11 +114,12 @@ public class BiObjectiveSetManager implements ParetoSetManager
         throw new UnsupportedOperationException();
     }  
     
-    //@Override
+    /**
+     * Factory method to return and instance of ParetoSetManager to maintain the
+     * solutions. Takes a seed used by the class when returning a random member
+     */
     public static ParetoSetManager managerFactory(long seed) throws IllegalNumberOfObjectivesException
     {
-        //if (numberOfObjectives != 2)
-        //    throw new IllegalNumberOfObjectives("BiObjectiveSetManager can only manage solutions with two objectives");
         return new BiObjectiveSetManager(seed);
     }
     

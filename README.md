@@ -18,7 +18,17 @@ pages 489-497</br>
 
 ## multiobjective_data_structures.implementations
  
-<p>Contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). The Linear List, the Balanced Binary Tree (for bi-objective problems only), Quad Tree variants 1, 2, and 3, the Dominance Decision Tree, The BSP Tree, and the ND Tree</p>
+<p>Currently contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). Factory methods are provided in each of the implementations, which return a instance of the type declared as the common <code>ParetoSetManager</code> supertype interface.</p>
+ 
+* Linear List: <code>multiobjective_data_structures.implementations.LinearListManager.managerFactory(seed, numberOfObjectives)</code>
+* Balanced Binary Tree (for bi-objective problems only): <code>multiobjective_data_structures.implementations.BiObjectiveSetManager.managerFactory(seed)</code>
+* Quad Tree variants 1, 2, and 3: 
+  * <code>multiobjective_data_structures.implementations.MTQuadTree1.managerFactory(numberOfObjectives)</code>
+  * <code>multiobjective_data_structures.implementations.MTQuadTree2.managerFactory(numberOfObjectives)</code>
+  * <code>multiobjective_data_structures.implementations.MTQuadTree3.managerFactory(numberOfObjectives)</code>
+* Dominance Decision Tree: <code>multiobjective_data_structures.implementations.DominanceDecisionTreeManager.managerFactory(numberOfObjectives)</code>
+* BSP Tree: <code>multiobjective_data_structures.implementations.BSPTreeArchiveManager.managerFactory(numberOfObjectives)</code>
+* ND Tree: <code>multiobjective_data_structures.implementations.NDTree.managerFactory(numberOfObjectives)</code>
 
 ## multiobjective_data_structures.tests
 

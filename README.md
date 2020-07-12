@@ -44,7 +44,7 @@ pages 489-497</br>
 
   <code>Experiments.simulationExperiments()</code>
 
-<p>Will run each data structure in the package on each the file generated from the analytical generator. Note that you will want therefore to generate these files first -- matlab files are provided in the reporsitor for this. Files generated should be named </p>
+<p>Will run each data structure in the package on each the file generated from the analytical generator. Note that you will want therefore to generate these files first -- matlab files are provided in the repository for this. Files generated should be named </p>
 
   <code>GECCO2020_analytical_fold_" + fold + "\_objectives\_" + numberOfObjectives + "\_c\_" + c + "\_d\_" + d + "\_Nd\_"+ nd +".txt"</code>
 

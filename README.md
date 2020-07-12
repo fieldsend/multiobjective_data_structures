@@ -52,7 +52,7 @@ pages 489-497</br>
 
 # A few points to note:
 
-<p>In an unorthadox approach the unit tests are in the package  <code>multiobjective_data_structures.implementations.tests</code> rather than in a parallel structure. This is deliberate -- many of the tests are written to the abstract interafces provided (e.g. <code>ParetoSetManager</code>), so should be useful for testing any data structure that you might want to develop in the framework, and are therefore distrubuted with the package.</p>
+<p>In an unorthadox approach the unit tests are in the package  <code>multiobjective_data_structures.implementations.tests</code> rather than in a parallel structure. This is deliberate -- many of the tests are written to the core interface provided (e.g. <code>ParetoSetManager</code>), so should be useful for testing any data structure that you might want to develop in the framework, and are therefore distrubuted with the package.</p>
 
 <p>Most classes have JavaDoc for the methods -- I'll be tidying these up a bit post-GECCO, but often the internal variables are named according to the convention of the source paper (unless I made a decision that the name was too opaque).</p>
 

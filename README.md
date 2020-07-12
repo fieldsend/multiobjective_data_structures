@@ -18,7 +18,7 @@ pages 489-497</br>
 
 ## multiobjective_data_structures.implementations
  
-<p>Currently contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). Factory methods are provided in each of the implementations, which return a instance of the type declared as the common <code>ParetoSetManager</code> supertype interface.</p>
+<p>Currently contains the implementations of eight data structures from the liteature to store, query and update non-dominated sets of solutions (Pareto set approximations). Factory methods are provided in each of the implementations, which return an instance of the type declared as the common <code>ParetoSetManager</code> supertype interface.</p>
  
 * Linear List: <code>multiobjective_data_structures.implementations.LinearListManager.managerFactory(seed, numberOfObjectives)</code>
 * Balanced Binary Tree (for bi-objective problems only): <code>multiobjective_data_structures.implementations.BiObjectiveSetManager.managerFactory(seed)</code>

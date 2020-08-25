@@ -40,11 +40,11 @@ pages 489-497</br>
 
   <code>Experiments.dtlzExperiments()</code>
 
-<p>Will run each data structure in the package 30 times on each of DTLZ1 and DTLZ2 using a (1+1)--ES for 200,000 generations, for 2, 3, 5 and 10 objective dimensions, and write out timings results to file for each combination. Note the performance of some data structures serious degrades as the archive size and/or number of objectives increases, so unless you have cycles to burn you might not want to run all combinations(!).</p>
+<p>Will run each data structure in the package 30 times on each of DTLZ1 and DTLZ2 using a (1+1)--ES for 200,000 generations, for 2, 3, 5 and 10 objective dimensions, and write out timings results to file for each combination. Note the performance of some data structures seriously degrades as the archive size and/or number of objectives increases, so unless you have cycles to burn you might not want to run all combinations(!).</p>
 
   <code>Experiments.simulationExperiments()</code>
 
-<p>Will run each data structure in the package on each the file generated from the analytical generator. Note that you will want therefore to generate these files first -- matlab files are provided in the repository for this. Files generated should be named </p>
+<p>Will run each data structure in the package on each the file generated from the analytical generator. Note that you will want therefore to generate these files first -- matlab files containing functions for this are alos provided in the repository. Files generated should be named </p>
 
   <code>GECCO2020_analytical_fold_" + fold + "\_objectives\_" + numberOfObjectives + "\_c\_" + c + "\_d\_" + d + "\_Nd\_"+ nd +".txt"</code>
 
@@ -52,11 +52,11 @@ pages 489-497</br>
 
 # A few points to note:
 
-<p>In an unorthadox approach the unit tests are in the package  <code>multiobjective_data_structures.implementations.tests</code> rather than in a parallel structure. This is deliberate -- many of the tests are written to the core interface provided (e.g. <code>ParetoSetManager</code>), so should be useful for testing any data structure that you might want to develop in the framework, and are therefore distrubuted with the package.</p>
+<p>In an unorthadox approach the unit tests are in the package  <code>multiobjective_data_structures.implementations.tests</code> rather than in a parallel structure. This is deliberate -- many of the tests are written to the core interface provided (e.g. <code>ParetoSetManager</code>), so should be useful for testing any data structure that you might want to develop in the framework, and are therefore distrubuted directly with the package.</p>
 
-<p>Most classes have JavaDoc for the methods -- I'll be tidying these up a bit post-GECCO, but often the internal variables are named according to the convention of the source paper (unless I made a decision that the name was too opaque).</p>
+<p>Most classes have JavaDoc for the methods -- I'll be tidying these up a bit post-GECCO, but often the internal variables are named according to the convention of the source paper (unless I made a decision that the original name was too opaque).</p>
 
-<p>For computational efficiency the QuadTree apporaches precompute an array of arrays of child indices, rather than reclaculating them on the fly each time. This saves wasted computation, however due to the power term (it is 2^numberOfObjectives by 2^numberOfObjectives) for a high numberOfObjectives this is likely to hit memory bounds. Other data structures don't have this issue, and I'll likely develop an 'on the fly' version in the next substantial release for the QuadTree.</p>
+<p>For computational efficiency the QuadTree approaches precompute an array of arrays of child indices, rather than reclaculating them on the fly each time. This saves wasted computation, however due to the power term (it is 2^numberOfObjectives by 2^numberOfObjectives) for a high numberOfObjectives this is likely to hit memory bounds. Other data structures don't have this issue, and I'll likely develop an 'on the fly' version in the next substantial release for the QuadTree.</p>
 
 
 

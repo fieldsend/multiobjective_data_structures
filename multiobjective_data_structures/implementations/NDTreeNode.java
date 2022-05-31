@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 
 /**
@@ -170,15 +171,43 @@ public class NDTreeNode
                     if (member.weaklyDominates(solution))
                         return true;
                     if (solution.weaklyDominates(member))
-                        return false; // existing member dominated, so archive does not dominate
+                        return false; // existing member dominated (can't be equal given previous if check), so archive does not weakly-dominate
                 }
             } else 
                 for (NDTreeNode n : children) 
                     if (n.weaklyDominates(solution) == true)
-                        return true; // if it is dominatated further down tree, return false and stop processing further
+                        return true; // if it is wekly-dominatated further down tree, return false and stop processing further
+        }
+        return false; // not weakly-dominated by any solution ith node
+    }
+    
+    /**
+     * Checks if a solution is dominated by the archive
+     */
+    boolean dominates(Solution solution) {
+        if (Solution.dominates(nadirPointEstimate,solution))
+            return true;
+        if (Solution.weaklyDominates(solution,idealPointEstimate)){
+            return false;
+        }
+        if (Solution.dominates(idealPointEstimate,solution) || Solution.dominates(solution,nadirPointEstimate)){ // short-circuit or
+            if (this.isLeaf()) {
+                Iterator<Solution> iterator = list.iterator();
+                while (iterator.hasNext()) {
+                    Solution member = iterator.next();
+                    if (member.dominates(solution))
+                        return true;
+                    if (solution.weaklyDominates(member))
+                        return false; // existing member weakly-dominated, so archive does not dominate
+                }
+            } else 
+                for (NDTreeNode n : children) 
+                    if (n.weaklyDominates(solution) == true)
+                        return true; // if it is wekly-dominatated further down tree, return false and stop processing further
         }
         return false; // not dominated by any solution ith node
     }
+    
     
     /**
      * returns false if solution is dominated, else removed all dominated solutions and 
@@ -405,6 +434,24 @@ public class NDTreeNode
     }
     
     /**
+     * Returns a member of the (sub)tree rooted at this node uniformly at random
+     */
+    Solution getRandom(Random rng){
+        if  (this.isLeaf()) {
+            return list.get(rng.nextInt(list.size()));
+        }
+        int num = rng.nextInt(coverage());
+        int total = 0;
+        for (NDTreeNode c : children) {
+            total += c.coverage();
+            if (total >= num){
+                return c.getRandom(rng);
+            }    
+        }
+        return null; // should never occur
+    }
+    
+    /**
      * Recursively extracts all solutions covered by the (sub)tree rooted at this node
      */
     public void recursivelyExtract(List<Solution> a){
@@ -416,4 +463,25 @@ public class NDTreeNode
                 a.add(s);
     }
     
+    /**
+     * Fills the solutions list with solutions which approximately extremise the index
+     * objective
+     */
+    void getExtremeMember(ArrayList<Solution> solutions,int index) 
+    {
+        if  (this.isLeaf()) {
+            Solution c = list.get(0);
+            for (int i = 1; i<list.size(); i++)
+                if (list.get(i).getFitness(index) < c.getFitness(index))
+                    c = list.get(i);
+            solutions.add(c);      
+            return;
+        }
+        for (NDTreeNode c : children) {
+            if (idealPointEstimate[index] >= c.idealPointEstimate[index]){
+                c.getExtremeMember(solutions,index); 
+            }    
+        }
+        return;
+    }
 }

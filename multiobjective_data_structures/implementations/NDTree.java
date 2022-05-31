@@ -7,6 +7,7 @@ import java.util.List;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
+import java.util.Random;
 
 /**
  * NDTree, implementation of ND tree by Jaszkiewicz and Lust. Based on
@@ -23,6 +24,7 @@ public class NDTree implements ParetoSetManager
     private NDTreeNode root;
     private int maxListSizePerNode = 20;
     private int numberOfChildrenPerNode;
+    private Random rng = new Random();
     
     /*
      * Constructor -- called by factory method
@@ -70,6 +72,15 @@ public class NDTree implements ParetoSetManager
         }
     }
     
+    public boolean dominates(Solution s) throws IllegalNumberOfObjectivesException
+    {
+        if (root.isEmpty()) {
+            return false;
+        } else {
+            return root.dominates(s);
+        }
+    }
+    
     @Override
     public Collection<? extends Solution> getContents()
     {
@@ -93,7 +104,25 @@ public class NDTree implements ParetoSetManager
     @Override
     public Solution getRandomMember() throws UnsupportedOperationException
     {
-        throw new UnsupportedOperationException();
+        if (size() == 0)
+            return null; //empty tree, so return null
+        return root.getRandom(rng);
+    }
+    
+    /**
+     * Returns the solution extremising the index objective
+     */
+    public Solution getExtremeMember(int index) 
+    {
+        if (size() == 0)
+            return null; //empty tree, so return null
+        ArrayList<Solution> solutions = new ArrayList<>();    
+        root.getExtremeMember(solutions,index);
+        Solution extreme = solutions.get(0);
+        for (int i=1; i<solutions.size(); i++)
+            if (solutions.get(i).getFitness(index) < extreme.getFitness(index))
+                extreme = solutions.get(i);
+        return extreme;
     }
     
     
@@ -165,5 +194,13 @@ public class NDTree implements ParetoSetManager
      */
     public static ParetoSetManager managerFactory(int numberOfObjectives,int numberOfChildrenPerNode) {
         return new NDTree(numberOfObjectives,numberOfChildrenPerNode);
+    }
+    
+    /**
+     * Returns an NDTree instance to maintain an archive with the number of objectives 
+     * passed as an argument. Uses a default bin size of 20 in leaves
+     */
+    public static NDTree ndtreeFactory(int numberOfObjectives) {
+        return new NDTree(numberOfObjectives);
     }
 }

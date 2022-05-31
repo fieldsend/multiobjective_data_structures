@@ -133,6 +133,39 @@ public interface Solution {
     }
     
     /**
+     * Returns true if the objective vector represented by d dominates s, otherwise returns false
+     */
+    static boolean dominates(double[] d, Solution s){
+        int better = 0;
+        for (int i = 0; i < s.getNumberOfObjectives(); i++) {
+            if (d[i] < s.getFitness(i))
+                better++;
+            else if (d[i] > s.getFitness(i))
+                return false; // worse on an objective so can't dominate
+        }
+        if (better > 0)
+            return true; 
+        return false;
+    }
+    
+    /**
+     * Returns true if s dominates the objective vector represented by d, otherwise returns false
+     */
+    static boolean dominates(Solution s, double[] d){
+        int better = 0;
+        for (int i = 0; i < s.getNumberOfObjectives(); i++) {
+            if (s.getFitness(i) < d[i])
+                better++;
+            else if (s.getFitness(i) > d[i])
+                return false; // worse on an objective so can't dominate
+        
+        }
+        if (better > 0)
+            return true; 
+        return false;
+    }
+    
+    /**
      * Returns true if this Solution is better on all objectives than s. See e.g. Knowles et al.
      * A tutorial on the Performance Assessment of Stochastic Multiobjective Optimizers, 
      * ETH Zurich TIK-Report 214, 2006 for Strict Dominance definition.

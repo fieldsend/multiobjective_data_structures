@@ -277,8 +277,9 @@ public class NDTreeNode
                     this.nadirPointEstimate = child.nadirPointEstimate;
                     this.midpoint = child.midpoint;
                     this.children = child.children;
-                    for (NDTreeNode c : children)
-                        c.parent = this;
+                    if (children != null)
+                        for (NDTreeNode c : children)
+                            c.parent = this;
                 } else if (children.size()==0) {
                     // special case if all child nodes cleared out
                     children = null; // make a leaf

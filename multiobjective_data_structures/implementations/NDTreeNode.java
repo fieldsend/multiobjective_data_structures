@@ -25,6 +25,7 @@ public class NDTreeNode
     private NDTreeNode parent;
     private static int MAX_LIST_SIZE;
     private static int NUMBER_OF_CHILDREN;
+    private static double MIN_VALUE_FOR_VOLUME_CALCULATIONS = 0.00000001;
     
     /**
      * Node constructor -- only used to make root as doesn't connect upwards to a parent
@@ -276,6 +277,8 @@ public class NDTreeNode
                     this.nadirPointEstimate = child.nadirPointEstimate;
                     this.midpoint = child.midpoint;
                     this.children = child.children;
+                    for (NDTreeNode c : children)
+                        c.parent = this;
                 } else if (children.size()==0) {
                     // special case if all child nodes cleared out
                     children = null; // make a leaf
@@ -433,13 +436,48 @@ public class NDTreeNode
         }
     }
     
+    
+    /** 
+     * Returns the bucket (list) of solutions at a random leaf. Traversal down the 
+     * tree is proportional to the (est) volume bewteen the nadir and ideal defined by a node
+     */
+    List<Solution> getRandomLeaf(Random rng){
+        if  (this.isLeaf()) 
+            return list;
+        double totalVolume = 0.0;
+        double[] cumulativeVolumes = new double[children.size()]; 
+        int j=0;
+        for (NDTreeNode c : children) {
+            double tempVolume = 1.0;
+            // need small value to prevent zero volume where all objectives the same for one dimension
+            for (int i=0; i<c.idealPointEstimate.length; i++){
+                tempVolume *= Math.max(c.nadirPointEstimate[i]-c.idealPointEstimate[i],MIN_VALUE_FOR_VOLUME_CALCULATIONS);
+                totalVolume += tempVolume;
+            }
+            cumulativeVolumes[j] = (j>0) ? totalVolume + cumulativeVolumes[j-1] : totalVolume;
+            j++;
+        }
+        // now draw a real value on the range and go to the respective child
+        double draw = rng.nextDouble() * cumulativeVolumes[j-1];
+        double total = 0.0;
+        j=0;
+        for (NDTreeNode c : children) {
+            total += cumulativeVolumes[j];
+            if (total >= draw){
+                return c.getRandomLeaf(rng);
+            }
+            j++;
+        }
+        return null; // should never reach here
+    }
+    
     /**
      * Returns a member of the (sub)tree rooted at this node uniformly at random
      */
     Solution getRandom(Random rng){
-        if  (this.isLeaf()) {
+        if  (this.isLeaf()) 
             return list.get(rng.nextInt(list.size()));
-        }
+        
         int num = rng.nextInt(coverage());
         int total = 0;
         for (NDTreeNode c : children) {
@@ -483,5 +521,17 @@ public class NDTreeNode
             }    
         }
         return;
+    }
+    
+    public double[] getEstimatedIdeal() {
+        return idealPointEstimate;    
+    }
+    
+    public double[] getEstimatedNadir() {
+        return nadirPointEstimate;    
+    }
+    
+    public double[] getMidpoint() {
+        return midpoint;    
     }
 }

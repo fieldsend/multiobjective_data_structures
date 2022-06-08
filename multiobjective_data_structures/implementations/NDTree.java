@@ -72,6 +72,10 @@ public class NDTree implements ParetoSetManager
         }
     }
     
+    /**
+     * Returns true if at least one member of the archive dominates the argument. If no members 
+     * dominate, returns false
+     */
     public boolean dominates(Solution s) throws IllegalNumberOfObjectivesException
     {
         if (root.isEmpty()) {
@@ -88,6 +92,28 @@ public class NDTree implements ParetoSetManager
         if (root != null)
             root.recursivelyExtract(s);
         return s;
+    }
+    
+    public Solution[] getContentsInArray()  {
+        return getContents().toArray(new Solution[0]);
+    }
+    
+    public double[] getEstimatedIdeal() {
+        if (root == null)
+            return null;
+        return root.getEstimatedIdeal();    
+    }
+    
+    public double[] getEstimatedNadir() {
+        if (root == null)
+            return null;
+        return root.getEstimatedNadir();    
+    }
+    
+    public double[] getMidpoint() {
+        if (root == null)
+            return null;
+        return root.getMidpoint();    
     }
     
     @Override
@@ -108,6 +134,16 @@ public class NDTree implements ParetoSetManager
             return null; //empty tree, so return null
         return root.getRandom(rng);
     }
+    
+    /**
+     * Returns a list of solutions residing in one of the NDTree's leaves 
+     */
+    public List<Solution> getRandomLeaf() {
+        if (size() == 0)
+            return null; //empty tree, so return null
+        return root.getRandomLeaf(rng);
+    }
+    
     
     /**
      * Returns the solution extremising the index objective
@@ -202,5 +238,5 @@ public class NDTree implements ParetoSetManager
      */
     public static NDTree ndtreeFactory(int numberOfObjectives) {
         return new NDTree(numberOfObjectives);
-    }
+    }    
 }

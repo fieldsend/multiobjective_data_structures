@@ -460,11 +460,9 @@ public class NDTreeNode
         }
         // now draw a real value on the range and go to the respective child
         double draw = rng.nextDouble() * cumulativeVolumes[j-1];
-        double total = 0.0;
         j=0;
         for (NDTreeNode c : children) {
-            total += cumulativeVolumes[j];
-            if (total >= draw){
+            if (cumulativeVolumes[j] >= draw){
                 return c.getRandomLeaf(rng);
             }
             j++;

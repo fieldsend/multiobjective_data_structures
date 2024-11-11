@@ -27,7 +27,7 @@ public class Experiments
     /**
      * Method runs analytical function experiments and saves outputs to files. Loads analytical squenences from named files (see code for convention)
      */
-    public static void simulationExperiments() throws IllegalNumberOfObjectivesException, FileNotFoundException {
+    public static void simulationExperiments(String[] args) throws IllegalNumberOfObjectivesException, FileNotFoundException {
         ParetoSetManager list[] = new ParetoSetManager[8];
         String []  dsNames =  {"BSPT", "DDT", "NDT", "QT1", "QT2", "QT3", "LL", "BI"};
 

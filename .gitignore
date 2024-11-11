@@ -31,3 +31,5 @@ multiobjective_data_structures/implementations/LLObjectiveTree.java
 multiobjective_data_structures/implementations/LLWrappedObjectiveNode.java
 multiobjective_data_structures/XComparableSolutionAllValues.java
 GraphWriter.java
+.DS_Store
+multiobjective_data_structures.jar
